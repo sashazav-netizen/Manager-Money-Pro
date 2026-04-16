@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manager Money Pro</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #050810;
+            --glass: rgba(15, 23, 42, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --text-dim: #64748b;
+            --income: #10b981;
+            --expense: #f43f5e;
+            --fixed: #8b5cf6;
+            --accent: #0ea5e9;
+            --balance-final: #f59e0b;
+            --title-grad: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
+        }
+
+        * { box-sizing: border-box; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { 
+            margin: 0; padding: 10px; background: var(--bg); color: var(--text); min-height: 100vh;
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; padding-bottom: 120px; }
+
+        header { padding: 25px 0 15px 0; text-align: center; position: relative; }
+        
+        .brand { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
+        .brand span.diamond-logo { font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.4)); }
+        .brand h1 { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; margin: 0; font-weight: 900; color: white; }
+        .brand h1 span.accent { color: #38bdf8; }
+
+        .privacy-toast {
+            position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: rgba(14, 165, 233, 0.15); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #38bdf8; 
+            padding: 8px 20px; 
+            border-radius: 25px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            z-index: 5000;
+            opacity: 0; 
+            pointer-events: none; 
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .privacy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .header-tools { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px; }
+        .cloud-status { 
+            display: flex; align-items: center; gap: 6px; font-size: 0.7rem; font-weight: 800; color: var(--text-dim);
+            background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--glass-border);
+        }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--expense); }
+        .status-dot.online { background: var(--income); box-shadow: 0 0 8px var(--income); }
+
+        .tool-btn { font-size: 1.2rem; cursor: pointer; color: var(--text-dim); background: none; border: none; padding: 5px; transition: 0.2s; }
+        .tool-btn.active { color: var(--accent); }
+
+        .top-date-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--glass); padding: 8px 20px; border-radius: 15px;
+            border: 1px solid var(--glass-border); margin: 10px auto 20px; width: 100%; max-width: 240px;
+        }
+        .nav-btn { background: none; border: none; color: var(--accent); font-size: 1.4rem; cursor: pointer; }
+
+        .main-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 15px; border-radius: 20px; text-align: center; }
+        .stat-card.wide { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; }
+        .stat-card label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; font-weight: 800; }
+        .stat-card b { font-size: 1.25rem; }
+
+        .card-inc { border-bottom: 3px solid var(--income); }
+        .card-exp { border-bottom: 3px solid var(--expense); }
+        .val-current { color: var(--accent); text-shadow: 0 0 10px rgba(14, 165, 233, 0.3); }
+        .val-final { color: var(--balance-final); text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+
+        .money.blur { filter: blur(12px) !important; pointer-events: none; opacity: 0.6; }
+
+        .item { 
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; 
+            padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
+        .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; }
+
+        .footer-copyright {
+            text-align: center; font-size: 0.7rem; color: var(--text-dim);
+            padding: 15px 0 90px 0; font-weight: 700; letter-spacing: 1px;
+        }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+            background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border);
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000; backdrop-filter: blur(20px);
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-dim); cursor: pointer; flex: 1; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
+        .nav-item label { font-size: 0.6rem; font-weight: 800; margin-top: 4px; }
+
+        .fab { 
+            position: fixed; bottom: 90px; left: 20px; width: 55px; height: 55px; background: var(--title-grad); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; border: none; z-index: 1100;
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4); transition: 0.3s;
+        }
+        .fab.open { background: var(--expense); transform: rotate(45deg); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; backdrop-filter: blur(5px); }
+        .sheet { 
+            position: fixed; bottom: -100%; left: 0; width: 100%; background: #0f172a; 
+            border-radius: 30px 30px 0 0; z-index: 2001; padding: 30px 20px; transition: 0.4s;
+        }
+        .sheet.open { bottom: 0; }
+        
+        input, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: white; margin-bottom: 12px; outline: none; transition: 0.3s; }
+        input.error { border-color: var(--expense); background: rgba(244, 63, 94, 0.1); }
+        
+        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; font-family: 'Heebo', sans-serif; font-size: 1rem; }
+        .btn-cancel { width: 100%; padding: 12px; background: none; border: 1px solid var(--expense); border-radius: 15px; color: var(--expense); font-weight: 800; margin-top: 10px; cursor: pointer; font-family: 'Heebo', sans-serif; font-size: 0.9rem; }
+
+        .confirm-box { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: #1e293b; padding: 25px; border-radius: 25px; border: 1px solid var(--glass-border);
+            width: 85%; max-width: 320px; z-index: 3000; display: none; text-align: center;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .chart-box { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; }
+        .pie-container { max-width: 170px; width: 100%; margin-bottom: 20px; }
+        .settings-btn { width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="privacy-toast" id="privacyToast">
+    <span id="toastIcon">🔒</span>
+    <span id="toastText">מצב פרטיות פעיל</span>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
+
+<div class="confirm-box" id="confirmBox">
+    <h3 id="confirmTitle">אישור</h3>
+    <p id="confirmMsg" style="color: var(--text-dim); margin-bottom: 25px;"></p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <button onclick="executeConfirmed()" id="confirmExecBtn" style="padding: 14px; border-radius: 12px; border: none; color: white; font-weight: 800;">בצע</button>
+        <button onclick="closeConfirm()" style="padding: 14px; border-radius: 12px; border: none; background: rgba(255,255,255,0.1); color: white;">ביטול</button>
+    </div>
+</div>
+
+<div class="sheet" id="sheet">
+    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px;">פעולה</h2>
+    <input type="text" id="fDesc" placeholder="תיאור (למשל: סופרמרקט)">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal">
+        <select id="fType" onchange="toggleDateField()">
+            <option value="expense" selected>💸 הוצאה</option>
+            <option value="income">💰 הכנסה</option>
+            <option value="fixed">🔄 קבועה (אוטומטי)</option>
+        </select>
+    </div>
+    <input type="date" id="fDate">
+    <button class="btn-main" onclick="validateAndAsk()">שמור</button>
+    <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
+</div>
+
+<div class="sheet" id="settingsSheet">
+    <h2 style="text-align:center; margin-bottom:20px;">הגדרות וגיבוי</h2>
+    <button class="settings-btn" onclick="exportToCSV()"><span>📊</span> ייצוא נתוני חודש לאקסל (CSV)</button>
+    <button class="settings-btn" onclick="exportToJSON()"><span>💾</span> גיבוי מסד נתונים מלא (JSON)</button>
+    <button class="settings-btn" onclick="triggerImportJSON()"><span>📂</span> שחזור מגיבוי (JSON)</button>
+    <input type="file" id="importJsonFile" accept=".json" style="display:none">
+    <div style="text-align:center; margin-top:20px; color:var(--text-dim); font-size:0.8rem;">סנכרון ענן אוטומטי פעיל ✅</div>
+    <button class="btn-cancel" onclick="toggleSettings()">סגור</button>
+</div>
+
+<div class="container">
+    <header>
+        <div class="brand">
+            <span class="diamond-logo">💎</span>
+            <h1>Manager<span class="accent">Money</span></h1>
+        </div>
+        
+        <div class="header-tools">
+            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()" title="מצב פרטיות">👁️</button>
+            <button class="tool-btn" onclick="toggleSettings()" title="הגדרות">⚙️</button>
+            <div class="cloud-status">
+                <div id="statusDot" class="status-dot"></div>
+                <span id="statusText">Cloud Sync</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="top-date-nav">
+        <button class="nav-btn" onclick="changeMonth(-1)">▸</button>
+        <b id="monthLabel"></b>
+        <button class="nav-btn" onclick="changeMonth(1)">◂</button>
+    </div>
+
+    <div id="page-home" class="page active">
+        <div class="main-stats">
+            <div class="stat-card wide">
+                <div style="border-left: 1px solid var(--glass-border)"><label>יתרה נוכחית</label><b id="bCurrent" class="money val-current">₪0</b></div>
+                <div><label>יתרה לאחר קבועות</label><b id="bTotal" class="money val-final">₪0</b></div>
+            </div>
+            <div class="stat-card card-inc">
+                <label style="color:var(--income)">הכנסות ↗️</label>
+                <b id="bInc" class="money" style="color:var(--income)">₪0</b>
+            </div>
+            <div class="stat-card card-exp">
+                <label style="color:var(--expense)">הוצאות ↘️</label>
+                <b id="bExp" class="money" style="color:var(--expense)">₪0</b>
+            </div>
+        </div>
+        <div id="list-home"></div>
+    </div>
+
+    <div id="page-income" class="page"><div id="list-income"></div></div>
+    <div id="page-expense" class="page"><div id="list-expense"></div></div>
+    <div id="page-fixed" class="page"><div id="list-fixed"></div></div>
+    <div id="page-charts" class="page">
+        <div id="chartsEmpty" style="display:none;text-align:center;padding:60px 20px;color:var(--text-dim)">
+            <div style="font-size:3rem;margin-bottom:15px">📊</div>
+            <div style="font-weight:700;font-size:1rem;margin-bottom:8px">אין נתונים להצגה</div>
+            <div style="font-size:0.8rem">הוסף הכנסות והוצאות כדי לראות גרפים</div>
+        </div>
+        <div id="chartsContent">
+            <div class="chart-box"><canvas id="barChart"></canvas></div>
+            <div class="chart-box">
+                <div class="pie-container"><canvas id="pieChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-copyright">© 2026 ALEXANDER-ZAVODISKER</div>
+</div>
+
+<nav class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('home', this)"><span>🏠</span><label>בית</label></div>
+    <div class="nav-item" onclick="showPage('income', this)" style="color:var(--income)"><span>↗️</span><label>הכנסות</label></div>
+    <div class="nav-item" onclick="showPage('expense', this)" style="color:var(--expense)"><span>↘️</span><label>הוצאות</label></div>
+    <div class="nav-item" onclick="showPage('fixed', this)" style="color:var(--fixed)"><span>🔄</span><label>קבועות</label></div>
+    <div class="nav-item" onclick="showPage('charts', this)"><span>📊</span><label>גרפים</label></div>
+</nav>
+
+<div class="fab" id="mainFab" onclick="toggleFab()">+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyAZ2-EJjvIbDvtKLwKg3LObkIAs8sNhyjU",
+    authDomain: "managermoney-49d0e.firebaseapp.com",
+    projectId: "managermoney-49d0e",
+    databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
+};
+firebase.initializeApp(firebaseConfig);
+let db, entries = [], viewDate = new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
+
+function init() {
+    firebase.auth().signInAnonymously().then(user => {
+        db = firebase.database().ref(`users/${user.user.uid}/data`);
+        document.getElementById('statusDot').className = 'status-dot online';
+        document.getElementById('statusText').innerText = 'מחובר ✓';
+        db.on('value', snap => {
+            entries = snap.val() ? Object.values(snap.val()) : [];
+            render();
+            if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+        });
+    }).catch(() => {
+        document.getElementById('statusText').innerText = 'לא מקוון';
+        document.getElementById('statusDot').style.background = 'var(--text-dim)';
+        render();
+    });
+}
+
+function validateAndAsk() {
+    const desc = document.getElementById('fDesc');
+    const amount = document.getElementById('fAmount');
+    let valid = true;
+    [desc, amount].forEach(el => el.classList.remove('error'));
+    if (!desc.value.trim()) { desc.classList.add('error'); valid = false; }
+    if (!amount.value || parseFloat(amount.value) <= 0) { amount.classList.add('error'); valid = false; }
+    if (!valid) return;
+    askSaveConfirm();
+}
+
+function togglePrivacy() {
+    isPrivate = !isPrivate;
+    document.getElementById('eyeBtn').classList.toggle('active');
+    const toast = document.getElementById('privacyToast');
+    const toastText = document.getElementById('toastText');
+    const toastIcon = document.getElementById('toastIcon');
+    if (isPrivate) { toastText.innerText = "מצב פרטיות פעיל"; toastIcon.innerText = "🔒"; }
+    else { toastText.innerText = "תצוגה רגילה"; toastIcon.innerText = "👁️"; }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2200);
+    applyPrivacyUI();
+}
+
+function applyPrivacyUI() {
+    document.querySelectorAll('.money').forEach(el => isPrivate ? el.classList.add('blur') : el.classList.remove('blur'));
+}
+
+function render() {
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', {month:'long', year:'numeric'}).format(viewDate);
+
+    // ════ תיקון 1: קבועות מוצגות תמיד, אבל מסוננות בנפרד ══════════
+    // הכנסות והוצאות — רק של החודש הנוכחי
+    const monthEntries = entries.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
+    });
+    // קבועות — תמיד כולן (הן לא תלויות חודש)
+    const fixedEntries = entries.filter(e => e.type === 'fixed');
+
+    let inc = 0, exp = 0, fix = 0;
+    monthEntries.forEach(e => {
+        if(e.type === 'income') inc += e.amount;
+        else if(e.type === 'expense') exp += e.amount;
+    });
+    fixedEntries.forEach(e => fix += e.amount);
+
+    document.getElementById('bInc').innerText = `₪${inc.toLocaleString()}`;
+    document.getElementById('bExp').innerText = `₪${exp.toLocaleString()}`;
+    document.getElementById('bCurrent').innerText = `₪${(inc - exp).toLocaleString()}`;
+    document.getElementById('bTotal').innerText = `₪${(inc - exp - fix).toLocaleString()}`;
+
+    // רשימת בית = פריטי החודש + קבועות
+    renderList('list-home', [...monthEntries, ...fixedEntries]);
+    renderList('list-income', monthEntries.filter(e => e.type === 'income'));
+    renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
+    renderList('list-fixed', fixedEntries);
+    applyPrivacyUI();
+}
+
+function safe(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderList(id, data) {
+    const el = document.getElementById(id); if(!el) return;
+    if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
+    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
+        <div class="item">
+            <div onclick="openEdit('${e.id}')" style="flex:1;cursor:pointer;">
+                ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
+                <b>${safe(e.desc)}</b><br><small style="color:var(--text-dim)">${e.date || '—'}</small>
+            </div>
+            <div style="display:flex; align-items:center;">
+                <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
+                <span class="trash-btn" onclick="event.stopPropagation();askDeleteConfirm('${e.id}')">🗑️</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function toggleFab() {
+    isFabOpen = !isFabOpen;
+    document.getElementById('mainFab').classList.toggle('open');
+    document.getElementById('sheet').classList.toggle('open');
+    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
+    if(!isFabOpen) { editId = null; resetForm(); }
+}
+
+function toggleSettings() {
+    isSettingsOpen = !isSettingsOpen;
+    document.getElementById('settingsSheet').classList.toggle('open');
+    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
+}
+
+function closeAllSheets() { if(isFabOpen) toggleFab(); if(isSettingsOpen) toggleSettings(); }
+
+function toggleDateField() {
+    const type = document.getElementById('fType').value;
+    document.getElementById('fDate').style.display = type === 'fixed' ? 'none' : 'block';
+}
+
+function resetForm() {
+    document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = '';
+    document.getElementById('fType').value = 'expense'; document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+    toggleDateField();
+    document.getElementById('modalTitle').innerText = 'פעולה חדשה';
+    document.getElementById('fDesc').classList.remove('error');
+    document.getElementById('fAmount').classList.remove('error');
+}
+
+function openEdit(id) {
+    editId = id;
+    const e = entries.find(x => x.id === id);
+    if(!e) return; // safety: item not found
+    document.getElementById('fDesc').value = e.desc;
+    document.getElementById('fAmount').value = e.amount;
+    document.getElementById('fType').value = e.type;
+    document.getElementById('fDate').value = e.date || '';
+    toggleDateField(); // show/hide date based on type
+    document.getElementById('modalTitle').innerText = 'עריכת פעולה';
+    toggleFab();
+}
+
+function askSaveConfirm() { pendingAction = 'save'; showConfirm("שמירה", "לעדכן את הנתונים לענן?", "var(--accent)"); }
+function askDeleteConfirm(id) { editId = id; pendingAction = 'delete'; showConfirm("מחיקה", "למחוק את הפעולה?", "var(--expense)"); }
+
+function showConfirm(title, msg, color) {
+    document.getElementById('confirmTitle').innerText = title; document.getElementById('confirmMsg').innerText = msg;
+    document.getElementById('confirmExecBtn').style.background = color; document.getElementById('confirmBox').style.display = 'block';
+    document.getElementById('overlay').style.zIndex = '2500'; document.getElementById('overlay').style.display = 'block';
+}
+
+function executeConfirmed() {
+    if(pendingAction === 'save') {
+        const id = editId || Date.now().toString();
+        const type = document.getElementById('fType').value;
+        // קבועות נשמרות בלי תאריך ספציפי
+        const date = type === 'fixed' ? '' : document.getElementById('fDate').value;
+        db.child(id).set({
+            id,
+            desc: document.getElementById('fDesc').value,
+            amount: Math.round(parseFloat(document.getElementById('fAmount').value) * 100) / 100,
+            type,
+            date
+        }).then(() => {
+            showToast('✅ נשמר בהצלחה', 'var(--income)');
+        }).catch(() => {
+            showToast('❌ שגיאה בשמירה — בדוק חיבור', 'var(--expense)');
+        });
+    } else if(pendingAction === 'delete') {
+        db.child(editId).remove();
+    }
+    closeConfirm(); if(isFabOpen) toggleFab();
+}
+
+function closeConfirm() {
+    document.getElementById('confirmBox').style.display = 'none';
+    document.getElementById('overlay').style.zIndex = '2000';
+    if(!isFabOpen && !isSettingsOpen) document.getElementById('overlay').style.display = 'none';
+}
+
+function showPage(p, el) {
+    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
+    document.getElementById('page-' + p).classList.add('active'); el.classList.add('active');
+    if(p === 'charts') updateCharts();
+}
+
+function updateCharts() {
+    // Show empty state if no data at all
+    const hasAny = entries.length > 0;
+    document.getElementById('chartsEmpty').style.display   = hasAny ? 'none'  : 'block';
+    document.getElementById('chartsContent').style.display = hasAny ? 'block' : 'none';
+    if(!hasAny) return;
+
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    const labels = []; const ds = { inc:[], exp:[], fix:[] };
+    const fixedTotal = entries.filter(e => e.type === 'fixed').reduce((a,b) => a+b.amount, 0);
+
+    // ════ תיקון 2: גרף עמודות — שימוש ב-viewDate ולא new Date() ══════
+    for(let i=5; i>=0; i--) {
+        const d = new Date(viewDate.getFullYear(), viewDate.getMonth() - i, 1);
+        labels.push(new Intl.DateTimeFormat('he-IL', {month:'short'}).format(d));
+        const mD = entries.filter(e => {
+            const ed = new Date(e.date);
+            return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
+        });
+        ds.inc.push(mD.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0));
+        ds.exp.push(mD.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0));
+        ds.fix.push(fixedTotal);
+    }
+
+    const avgInc = Math.round(ds.inc.reduce((a,b)=>a+b,0) / 6);
+    const avgExp = Math.round(ds.exp.reduce((a,b)=>a+b,0) / 6);
+
+    if(charts.bar) charts.bar.destroy();
+    charts.bar = new Chart(ctxBar, {
+        type: 'bar', data: { labels, datasets: [
+            { label: `הכנסות (₪${avgInc.toLocaleString()} ממוצע)`, data: ds.inc, backgroundColor: '#10b981' },
+            { label: `הוצאות (₪${avgExp.toLocaleString()} ממוצע)`, data: ds.exp, backgroundColor: '#f43f5e' },
+            { label: `קבועות (₪${fixedTotal.toLocaleString()})`, data: ds.fix, backgroundColor: '#8b5cf6' }
+        ]}, options: { 
+            responsive: true, 
+            plugins: { legend: { display: true, labels: { color: '#64748b', font: { size: 10 } } } }, 
+            scales: { y: { ticks: { color: '#64748b' } }, x: { ticks: { color: '#64748b' } } }
+        }
+    });
+
+    // ════ תיקון 3: גרף עוגה — הוספת getFullYear() ══════════════════
+    const cur = entries.filter(e => {
+        const ed = new Date(e.date);
+        return ed.getMonth() === viewDate.getMonth() && ed.getFullYear() === viewDate.getFullYear();
+    });
+    const curInc = cur.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0);
+    const curExp = cur.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0);
+
+    if(charts.pie) charts.pie.destroy();
+    charts.pie = new Chart(ctxPie, {
+        type: 'doughnut', data: { 
+            labels: [
+                `הכנסות: ₪${curInc.toLocaleString()}`, 
+                `הוצאות: ₪${curExp.toLocaleString()}`, 
+                `קבועות: ₪${fixedTotal.toLocaleString()}`
+            ], 
+            datasets: [{ 
+                data: [curInc, curExp, fixedTotal], 
+                backgroundColor: ['#10b981','#f43f5e','#8b5cf6'], 
+                borderWidth: 0 
+            }]
+        },
+        options: { 
+            cutout: '75%', 
+            plugins: { legend: { display: true, position: 'bottom', labels: { color: '#64748b', font: { size: 11 }, padding: 15 } } } 
+        }
+    });
+    applyPrivacyUI();
+}
+
+function exportToCSV() {
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    const monthEntries = entries.filter(e => { const d = new Date(e.date); return d.getMonth() === m && d.getFullYear() === y; });
+    const fixedEntries = entries.filter(e => e.type === 'fixed');
+    const all = [...monthEntries, ...fixedEntries];
+    let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
+    all.forEach(e => { csv += `${e.desc},${e.amount},${e.type},${e.date || 'קבוע'}\n`; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `money-${m+1}-${y}.csv`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function exportToJSON() {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'backup.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function triggerImportJSON() {
+    document.getElementById('importJsonFile').click();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('importJsonFile').addEventListener('change', function(ev) {
+        const file = ev.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if(!Array.isArray(data)) throw new Error('not array');
+                if(!db) { showToast('❌ אין חיבור ענן', 'var(--expense)'); return; }
+                // Write all items to Firebase
+                const batch = {};
+                data.forEach(item => { batch[item.id] = item; });
+                db.set(batch).then(() => {
+                    showToast(`📂 שוחזרו ${data.length} פריטים`, null);
+                }).catch(() => showToast('❌ שגיאה בשחזור', 'var(--expense)'));
+            } catch {
+                showToast('❌ קובץ JSON לא תקין', 'var(--expense)');
+            }
+        };
+        reader.readAsText(file);
+        ev.target.value = '';
+    });
+});
+
+// ════ תיקון 1: changeMonth — יצירת אובייקט Date חדש ══════════════
+// viewDate.setMonth() גורם לבאג: 31 ינואר + חודש = 3 מרץ
+function changeMonth(n) {
+    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
+    render();
+    if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+}
+
+// ── Toast helper ──────────────────────────────────────────────
+function showToast(msg, color) {
+    const toast = document.getElementById('privacyToast');
+    const icon  = document.getElementById('toastIcon');
+    const text  = document.getElementById('toastText');
+    icon.innerText  = '';
+    text.innerText  = msg;
+    toast.style.background = color || 'rgba(14,165,233,0.15)';
+    toast.style.color      = color === 'var(--expense)' ? '#f43f5e' : '#38bdf8';
+    toast.style.borderColor= color === 'var(--expense)' ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.3)';
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ESC key closes modals and sheets
+document.addEventListener('keydown', function(e) {
+    if(e.key === 'Escape') {
+        closeConfirm();
+        closeAllSheets();
+    }
+});
+
+init();
+</script>
+</body>
+</html>
