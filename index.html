@@ -5,16 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Manager Money Pro</title>
 
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#050810">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MoneyPro">
-    
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="apple-touch-icon" href="icon.png">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
     
@@ -286,13 +276,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 let db, entries = [], viewDate = new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
 
-// רישום ה-Service Worker ל-PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error:', err));
-    });
-}
-
 function init() {
     firebase.auth().signInAnonymously().then(user => {
         db = firebase.database().ref(`users/${user.user.uid}/data`);
@@ -342,10 +325,13 @@ function render() {
     const m = viewDate.getMonth(), y = viewDate.getFullYear();
     document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', {month:'long', year:'numeric'}).format(viewDate);
 
+    // ════ תיקון 1: קבועות מוצגות תמיד, אבל מסוננות בנפרד ══════════
+    // הכנסות והוצאות — רק של החודש הנוכחי
     const monthEntries = entries.filter(e => {
         const d = new Date(e.date);
         return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
     });
+    // קבועות — תמיד כולן (הן לא תלויות חודש)
     const fixedEntries = entries.filter(e => e.type === 'fixed');
 
     let inc = 0, exp = 0, fix = 0;
@@ -360,6 +346,7 @@ function render() {
     document.getElementById('bCurrent').innerText = `₪${(inc - exp).toLocaleString()}`;
     document.getElementById('bTotal').innerText = `₪${(inc - exp - fix).toLocaleString()}`;
 
+    // רשימת בית = פריטי החודש + קבועות
     renderList('list-home', [...monthEntries, ...fixedEntries]);
     renderList('list-income', monthEntries.filter(e => e.type === 'income'));
     renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
@@ -421,12 +408,12 @@ function resetForm() {
 function openEdit(id) {
     editId = id;
     const e = entries.find(x => x.id === id);
-    if(!e) return;
+    if(!e) return; // safety: item not found
     document.getElementById('fDesc').value = e.desc;
     document.getElementById('fAmount').value = e.amount;
     document.getElementById('fType').value = e.type;
     document.getElementById('fDate').value = e.date || '';
-    toggleDateField();
+    toggleDateField(); // show/hide date based on type
     document.getElementById('modalTitle').innerText = 'עריכת פעולה';
     toggleFab();
 }
@@ -444,6 +431,7 @@ function executeConfirmed() {
     if(pendingAction === 'save') {
         const id = editId || Date.now().toString();
         const type = document.getElementById('fType').value;
+        // קבועות נשמרות בלי תאריך ספציפי
         const date = type === 'fixed' ? '' : document.getElementById('fDate').value;
         db.child(id).set({
             id,
@@ -454,7 +442,7 @@ function executeConfirmed() {
         }).then(() => {
             showToast('✅ נשמר בהצלחה', 'var(--income)');
         }).catch(() => {
-            showToast('❌ שגיאה בשמירה', 'var(--expense)');
+            showToast('❌ שגיאה בשמירה — בדוק חיבור', 'var(--expense)');
         });
     } else if(pendingAction === 'delete') {
         db.child(editId).remove();
@@ -476,6 +464,7 @@ function showPage(p, el) {
 }
 
 function updateCharts() {
+    // Show empty state if no data at all
     const hasAny = entries.length > 0;
     document.getElementById('chartsEmpty').style.display   = hasAny ? 'none'  : 'block';
     document.getElementById('chartsContent').style.display = hasAny ? 'block' : 'none';
@@ -486,6 +475,7 @@ function updateCharts() {
     const labels = []; const ds = { inc:[], exp:[], fix:[] };
     const fixedTotal = entries.filter(e => e.type === 'fixed').reduce((a,b) => a+b.amount, 0);
 
+    // ════ תיקון 2: גרף עמודות — שימוש ב-viewDate ולא new Date() ══════
     for(let i=5; i>=0; i--) {
         const d = new Date(viewDate.getFullYear(), viewDate.getMonth() - i, 1);
         labels.push(new Intl.DateTimeFormat('he-IL', {month:'short'}).format(d));
@@ -514,6 +504,7 @@ function updateCharts() {
         }
     });
 
+    // ════ תיקון 3: גרף עוגה — הוספת getFullYear() ══════════════════
     const cur = entries.filter(e => {
         const ed = new Date(e.date);
         return ed.getMonth() === viewDate.getMonth() && ed.getFullYear() === viewDate.getFullYear();
@@ -581,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = JSON.parse(e.target.result);
                 if(!Array.isArray(data)) throw new Error('not array');
                 if(!db) { showToast('❌ אין חיבור ענן', 'var(--expense)'); return; }
+                // Write all items to Firebase
                 const batch = {};
                 data.forEach(item => { batch[item.id] = item; });
                 db.set(batch).then(() => {
@@ -595,12 +587,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ════ תיקון 1: changeMonth — יצירת אובייקט Date חדש ══════════════
+// viewDate.setMonth() גורם לבאג: 31 ינואר + חודש = 3 מרץ
 function changeMonth(n) {
     viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
     render();
     if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
 
+// ── Toast helper ──────────────────────────────────────────────
 function showToast(msg, color) {
     const toast = document.getElementById('privacyToast');
     const icon  = document.getElementById('toastIcon');
@@ -615,6 +610,7 @@ function showToast(msg, color) {
     toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
+// ESC key closes modals and sheets
 document.addEventListener('keydown', function(e) {
     if(e.key === 'Escape') {
         closeConfirm();
@@ -626,3 +622,4 @@ init();
 </script>
 </body>
 </html>
+
