@@ -156,9 +156,78 @@
         .chart-box { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; }
         .pie-container { max-width: 170px; width: 100%; margin-bottom: 20px; }
         .settings-btn { width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+
+        /* ── LOGIN SCREEN ───────────────────────────── */
+        .login-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            padding: 30px; text-align: center;
+        }
+        .login-screen.hidden { display: none; }
+        .login-logo { font-size: 5rem; margin-bottom: 10px;
+            filter: drop-shadow(0 0 20px rgba(167,139,250,0.5)); }
+        .login-title { font-family: 'Montserrat', sans-serif; font-size: 2rem;
+            font-weight: 900; color: white; margin-bottom: 6px; }
+        .login-title span { color: #38bdf8; }
+        .login-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 40px; line-height: 1.6; }
+        .login-btn {
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; max-width: 320px; padding: 16px 24px;
+            background: white; color: #1a1a2e;
+            border: none; border-radius: 16px; cursor: pointer;
+            font-size: 1rem; font-weight: 800; font-family: 'Heebo', sans-serif;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: 0.2s;
+            margin-bottom: 14px;
+        }
+        .login-btn:active { transform: scale(0.97); }
+        .login-btn-google { background: white; }
+        .login-btn-anon {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-dim); font-size: 0.85rem;
+            box-shadow: none;
+        }
+        .login-footer { font-size: 0.65rem; color: var(--text-dim);
+            margin-top: 30px; line-height: 1.6; max-width: 280px; }
+        .user-chip {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 4px 12px 4px 6px;
+            font-size: 0.7rem; color: var(--text-dim); cursor: pointer;
+        }
+        .user-chip img { width: 22px; height: 22px; border-radius: 50%; }
+        .user-chip span { font-weight: 700; }
     </style>
 </head>
 <body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-logo">💎</div>
+    <div class="login-title">Manager<span>Money</span></div>
+    <div class="login-sub">ניהול תקציב אישי חכם<br>הנתונים שלך מסונכרנים בענן בזמן אמת</div>
+
+    <button class="login-btn login-btn-google" onclick="loginGoogle()">
+        <svg width="22" height="22" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        התחבר עם Google
+    </button>
+
+    <button class="login-btn login-btn-anon" onclick="loginAnon()">
+        👤 המשך ללא חשבון
+    </button>
+
+    <div class="login-footer">
+        בהתחברות עם Google הנתונים שלך מסונכרנים<br>
+        בין כל המכשירים שלך באופן אוטומטי 🔒
+    </div>
+</div>
 
 <div class="privacy-toast" id="privacyToast">
     <span id="toastIcon">🔒</span>
@@ -212,7 +281,11 @@
         <div class="header-tools">
             <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()" title="מצב פרטיות">👁️</button>
             <button class="tool-btn" onclick="toggleSettings()" title="הגדרות">⚙️</button>
-            <div class="cloud-status">
+            <div id="userChip" class="user-chip" onclick="showLogoutConfirm()" style="display:none">
+                <img id="userAvatar" src="" alt="">
+                <span id="userName"></span>
+            </div>
+            <div class="cloud-status" id="cloudStatus">
                 <div id="statusDot" class="status-dot"></div>
                 <span id="statusText">Cloud Sync</span>
             </div>
@@ -284,20 +357,74 @@ firebase.initializeApp(firebaseConfig);
 const _saved = sessionStorage.getItem('mm_viewDate');
 let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
 
-function init() {
-    firebase.auth().signInAnonymously().then(user => {
-        db = firebase.database().ref(`users/${user.user.uid}/data`);
-        document.getElementById('statusDot').className = 'status-dot online';
-        document.getElementById('statusText').innerText = 'מחובר ✓';
-        db.on('value', snap => {
-            entries = snap.val() ? Object.values(snap.val()) : [];
-            render();
-            if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+// ── LOGIN FUNCTIONS ──────────────────────────────────────
+function loginGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    firebase.auth().signInWithPopup(provider)
+        .catch(err => {
+            // Popup blocked on mobile — try redirect
+            if(err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+                firebase.auth().signInWithRedirect(provider);
+            } else {
+                showToast('❌ שגיאה בהתחברות', 'var(--expense)');
+            }
         });
-    }).catch(() => {
-        document.getElementById('statusText').innerText = 'לא מקוון';
-        document.getElementById('statusDot').style.background = 'var(--text-dim)';
-        render();
+}
+
+function loginAnon() {
+    firebase.auth().signInAnonymously()
+        .catch(() => showToast('❌ שגיאת חיבור', 'var(--expense)'));
+}
+
+function showLogoutConfirm() {
+    if(confirm('להתנתק מהחשבון?')) {
+        firebase.auth().signOut();
+    }
+}
+
+function updateUserUI(user) {
+    const chip   = document.getElementById('userChip');
+    const avatar = document.getElementById('userAvatar');
+    const name   = document.getElementById('userName');
+    const cloud  = document.getElementById('cloudStatus');
+    if(user && !user.isAnonymous) {
+        chip.style.display = 'flex';
+        cloud.style.display = 'none';
+        avatar.src = user.photoURL || '';
+        avatar.style.display = user.photoURL ? 'block' : 'none';
+        name.textContent = user.displayName ? user.displayName.split(' ')[0] : 'משתמש';
+    } else {
+        chip.style.display = 'none';
+        cloud.style.display = 'flex';
+    }
+}
+
+function init() {
+    // Handle Google redirect result first
+    firebase.auth().getRedirectResult().catch(() => {});
+
+    // Listen to auth state changes
+    firebase.auth().onAuthStateChanged(user => {
+        if(user) {
+            // User is logged in — hide login screen, load data
+            document.getElementById('loginScreen').classList.add('hidden');
+            updateUserUI(user);
+            db = firebase.database().ref('users/' + user.uid + '/data');
+            document.getElementById('statusDot').className = 'status-dot online';
+            document.getElementById('statusText').innerText = user.isAnonymous ? 'לא מקוון' : 'מחובר ✓';
+            db.on('value', snap => {
+                entries = snap.val() ? Object.values(snap.val()) : [];
+                render();
+                if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+            });
+        } else {
+            // Not logged in — show login screen
+            document.getElementById('loginScreen').classList.remove('hidden');
+            if(db) db.off();
+            db = null;
+            entries = [];
+        }
     });
 }
 
