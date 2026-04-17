@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Manager Money Pro</title>
+    <meta name="theme-color" content="#050810">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Manager Money">
+    <meta name="description" content="ניהול תקציב אישי חכם">
+    <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
@@ -274,7 +281,8 @@ const firebaseConfig = {
     databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
 };
 firebase.initializeApp(firebaseConfig);
-let db, entries = [], viewDate = new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
+const _saved = sessionStorage.getItem('mm_viewDate');
+let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
 
 function init() {
     firebase.auth().signInAnonymously().then(user => {
@@ -352,6 +360,9 @@ function render() {
     renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
     renderList('list-fixed', fixedEntries);
     applyPrivacyUI();
+    // כותרת דינמית עם יתרה
+    const balance = inc - exp - fix;
+    document.title = `₪${balance.toLocaleString()} | Manager Money`;
 }
 
 function safe(s) {
@@ -419,7 +430,13 @@ function openEdit(id) {
 }
 
 function askSaveConfirm() { pendingAction = 'save'; showConfirm("שמירה", "לעדכן את הנתונים לענן?", "var(--accent)"); }
-function askDeleteConfirm(id) { editId = id; pendingAction = 'delete'; showConfirm("מחיקה", "למחוק את הפעולה?", "var(--expense)"); }
+function askDeleteConfirm(id) {
+    editId = id;
+    pendingAction = 'delete';
+    const e = entries.find(x => x.id === id);
+    const name = e ? safe(e.desc) : 'פעולה זו';
+    showConfirm("מחיקה", `למחוק את "${name}"?`, "var(--expense)");
+}
 
 function showConfirm(title, msg, color) {
     document.getElementById('confirmTitle').innerText = title; document.getElementById('confirmMsg').innerText = msg;
@@ -445,7 +462,11 @@ function executeConfirmed() {
             showToast('❌ שגיאה בשמירה — בדוק חיבור', 'var(--expense)');
         });
     } else if(pendingAction === 'delete') {
-        db.child(editId).remove();
+        const delId = editId;
+        editId = null;
+        db.child(delId).remove()
+            .then(() => showToast('🗑️ נמחק בהצלחה', null))
+            .catch(() => showToast('❌ שגיאה במחיקה', 'var(--expense)'));
     }
     closeConfirm(); if(isFabOpen) toggleFab();
 }
@@ -460,6 +481,8 @@ function showPage(p, el) {
     document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
     document.getElementById('page-' + p).classList.add('active'); el.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if(navigator.vibrate) navigator.vibrate(18);
     if(p === 'charts') updateCharts();
 }
 
@@ -540,7 +563,9 @@ function exportToCSV() {
     const fixedEntries = entries.filter(e => e.type === 'fixed');
     const all = [...monthEntries, ...fixedEntries];
     let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
-    all.forEach(e => { csv += `${e.desc},${e.amount},${e.type},${e.date || 'קבוע'}\n`; });
+    // CSV protection: wrap fields with commas in quotes
+    const csvField = v => String(v||'').includes(',') ? `"${v}"` : String(v||'');
+    all.forEach(e => { csv += `${csvField(e.desc)},${e.amount},${e.type},${e.date || 'קבוע'}\n`; });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -562,8 +587,8 @@ function triggerImportJSON() {
     document.getElementById('importJsonFile').click();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('importJsonFile').addEventListener('change', function(ev) {
+// הסקריפט נמצא ב-<body> — DOM מוכן, אין צורך ב-DOMContentLoaded
+document.getElementById('importJsonFile').addEventListener('change', function(ev) {
         const file = ev.target.files[0];
         if(!file) return;
         const reader = new FileReader();
@@ -584,13 +609,13 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         reader.readAsText(file);
         ev.target.value = '';
-    });
 });
 
 // ════ תיקון 1: changeMonth — יצירת אובייקט Date חדש ══════════════
 // viewDate.setMonth() גורם לבאג: 31 ינואר + חודש = 3 מרץ
 function changeMonth(n) {
     viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
+    sessionStorage.setItem('mm_viewDate', viewDate.toISOString());
     render();
     if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
