@@ -2,13 +2,12 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Manager Money Pro</title>
+    
     <meta name="theme-color" content="#050810">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="description" content="ניהול תקציב אישי חכם">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
@@ -28,342 +27,185 @@
             --expense: #f43f5e;
             --fixed: #8b5cf6;
             --accent: #0ea5e9;
-            --balance-final: #f59e0b;
             --title-grad: linear-gradient(90deg, #38bdf8 0%, #818cf8 100%);
         }
 
-        * { box-sizing: border-box; font-family: 'Heebo', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Heebo', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            margin: 0; padding: 0;
+        }
+
         body { 
-            margin: 0; padding: 10px; background: var(--bg); color: var(--text); min-height: 100vh;
-            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
-            background-attachment: fixed; overflow-x: hidden;
+            background: var(--bg); 
+            color: var(--text); 
+            min-height: 100vh;
+            /* הבטחת רקע מלא גם כשהדף קצר */
+            background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%) no-repeat fixed;
+            overflow-x: hidden;
+            padding: 10px;
         }
 
-        .container { max-width: 500px; margin: 0 auto; padding-bottom: 140px; }
-        header { padding: 25px 0 15px 0; text-align: center; position: relative; }
-        .brand { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
-        .brand h1 { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; margin: 0; font-weight: 900; color: white; }
-        .brand h1 span.accent { color: #38bdf8; }
-
-        .privacy-toast {
-            position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-10px);
-            background: rgba(14, 165, 233, 0.15); backdrop-filter: blur(10px);
-            color: #38bdf8; padding: 8px 20px; border-radius: 25px; border: 1px solid rgba(56, 189, 248, 0.3);
-            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; z-index: 5000;
-            opacity: 0; pointer-events: none; transition: 0.5s;
+        /* מכולה ראשית שמוודאת שהתוכן לא "בורח" */
+        .container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            padding-bottom: 140px; 
+            min-height: calc(100vh - 20px);
         }
-        .privacy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        .header-tools { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px; }
-        .cloud-status { display: flex; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-dim); background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--glass-border); }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--expense); }
-        .status-dot.online { background: var(--income); box-shadow: 0 0 8px var(--income); }
+        header { padding: 30px 0 20px; text-align: center; }
+        .brand h1 { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; font-weight: 900; }
+        .brand h1 span { color: #38bdf8; }
 
-        .tool-btn { font-size: 1.2rem; cursor: pointer; color: var(--text-dim); background: none; border: none; padding: 5px; }
-        .tool-btn.active { color: var(--accent); }
+        .header-tools { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
+        .status-pill { 
+            background: rgba(255,255,255,0.05); 
+            padding: 5px 15px; 
+            border-radius: 20px; 
+            border: 1px solid var(--glass-border);
+            font-size: 0.8rem;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--expense); }
+        .dot.online { background: var(--income); box-shadow: 0 0 10px var(--income); }
 
-        .top-date-nav {
+        .top-nav {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--glass); padding: 8px 20px; border-radius: 15px;
-            border: 1px solid var(--glass-border); margin: 10px auto 20px; width: 100%; max-width: 240px;
+            background: var(--glass); padding: 10px 20px; border-radius: 15px;
+            border: 1px solid var(--glass-border); margin: 20px auto; width: 100%; max-width: 260px;
         }
-        .nav-btn { background: none; border: none; color: var(--accent); font-size: 1.4rem; cursor: pointer; }
+        .nav-btn { background: none; border: none; color: var(--accent); font-size: 1.5rem; cursor: pointer; }
 
-        .main-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 15px; border-radius: 20px; text-align: center; }
-        .stat-card.wide { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; }
-        .stat-card label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; font-weight: 800; }
-        .stat-card b { font-size: 1.25rem; }
-
-        .money.blur { filter: blur(12px) !important; pointer-events: none; opacity: 0.6; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 25px; }
+        .stat-card { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            padding: 20px; 
+            border-radius: 20px; 
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .stat-card label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 5px; }
+        .stat-card b { font-size: 1.4rem; display: block; }
 
         .item { 
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; 
-            padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
         }
-        .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
-        .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; }
 
         .bottom-nav {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
-            background: rgba(5, 8, 16, 0.95); border-top: 1px solid var(--glass-border);
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000; backdrop-filter: blur(20px);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 85px;
+            background: rgba(5, 8, 16, 0.9); border-top: 1px solid var(--glass-border);
+            display: flex; justify-content: space-around; align-items: center; 
+            z-index: 1000; backdrop-filter: blur(20px);
+            padding-bottom: env(safe-area-inset-bottom); /* תמיכה באייפונים ונוטץ' */
         }
-        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-dim); cursor: pointer; flex: 1; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); }
-        .nav-item label { font-size: 0.6rem; font-weight: 800; margin-top: 4px; }
+        .nav-link { display: flex; flex-direction: column; align-items: center; color: var(--text-dim); text-decoration: none; font-size: 0.7rem; }
+        .nav-link.active { color: var(--accent); }
+        .nav-link i { font-size: 1.5rem; margin-bottom: 5px; }
 
         .fab { 
-            position: fixed; bottom: 90px; left: 20px; width: 55px; height: 55px; background: var(--title-grad); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; border: none; z-index: 1100;
-            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+            position: fixed; bottom: 100px; left: 25px; width: 60px; height: 60px; 
+            background: var(--title-grad); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 2rem; color: #fff; border: none; z-index: 1100;
+            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4);
         }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; backdrop-filter: blur(5px); }
-        .sheet { 
-            position: fixed; bottom: -100%; left: 0; width: 100%; background: #0f172a; 
-            border-radius: 30px 30px 0 0; z-index: 2001; padding: 30px 20px; transition: 0.4s;
-        }
-        .sheet.open { bottom: 0; }
-        
-        input, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: white; margin-bottom: 12px; outline: none; }
-        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; font-size: 1rem; }
-        .btn-cancel { width: 100%; padding: 12px; background: none; border: 1px solid var(--expense); border-radius: 15px; color: var(--expense); font-weight: 800; margin-top: 10px; cursor: pointer; }
 
         .login-screen {
             position: fixed; inset: 0; z-index: 9999;
             background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px;
         }
-        .login-screen.hidden { display: none; }
-        .user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: var(--text-dim); }
-        .user-chip img { width: 22px; height: 22px; border-radius: 50%; }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        /* ── STATISTICS STYLING ── */
-        .big-stat { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 18px; text-align: center; }
-        .big-stat-num { font-size: 1.8rem; font-weight: 900; }
-        .big-stat-lbl { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
-        .big-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
-        .savings-bar-wrap { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 16px; margin-bottom: 10px; }
-        .savings-bar-bg { background: rgba(255,255,255,0.06); border-radius: 999px; height: 12px; overflow: hidden; margin-top: 10px; }
-        .savings-bar-fill { height: 100%; border-radius: 999px; transition: 1s cubic-bezier(.4,0,.2,1); }
-        .stat-row { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="login-screen" id="loginScreen">
-    <div style="font-size: 5rem; margin-bottom: 10px;">💎</div>
-    <div style="font-family: 'Montserrat'; font-size: 2rem; font-weight: 900; color: white; margin-bottom: 30px;">Manager<span style="color:#38bdf8">Money</span></div>
-    <button class="btn-main" onclick="loginGoogle()" style="background:white; color:#1a1a2e; max-width:320px;">התחבר עם Google</button>
-    <button onclick="loginAnon()" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer;">👤 המשך ללא חשבון</button>
-</div>
-
-<div class="privacy-toast" id="privacyToast">
-    <span id="toastIcon">🔒</span>
-    <span id="toastText">מצב פרטיות פעיל</span>
-</div>
-
-<div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
-
-<div class="sheet" id="sheet">
-    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px;">פעולה חדשה</h2>
-    <input type="text" id="fDesc" placeholder="תיאור">
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal">
-        <select id="fType" onchange="toggleDateField()">
-            <option value="expense" selected>💸 הוצאה</option>
-            <option value="income">💰 הכנסה</option>
-            <option value="fixed">🔄 קבועה</option>
-        </select>
-    </div>
-    <input type="date" id="fDate">
-    <button class="btn-main" onclick="saveEntry()">שמור</button>
-    <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
+    <div style="font-size: 5rem; margin-bottom: 20px;">💎</div>
+    <div class="brand"><h1>Manager<span>Money</span></h1></div>
+    <button class="btn-main" onclick="loginGoogle()" style="margin-top: 40px; width: 100%; padding: 18px; border-radius: 15px; border: none; font-weight: 900; background: white; color: black; cursor: pointer;">התחבר עם Google</button>
 </div>
 
 <div class="container">
     <header>
-        <div class="brand">
-            <h1>Manager<span class="accent">Money</span></h1>
-        </div>
+        <div class="brand"><h1>Manager<span>Money</span></h1></div>
         <div class="header-tools">
-            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()">👁️</button>
-            <div id="userChip" class="user-chip" style="display:none">
-                <img id="userAvatar" src=""><span id="userName"></span>
+            <div class="status-pill">
+                <div id="statusDot" class="dot"></div>
+                <span id="statusText">מתחבר...</span>
             </div>
-            <div class="cloud-status">
-                <div id="statusDot" class="status-dot"></div>
-                <span id="statusText">Cloud Sync</span>
-            </div>
+            <span id="eyeBtn" style="font-size: 1.3rem; cursor: pointer;">👁️</span>
         </div>
     </header>
 
-    <div class="top-date-nav">
+    <div class="top-nav">
         <button class="nav-btn" onclick="changeMonth(-1)">▸</button>
-        <b id="monthLabel"></b>
+        <b id="monthLabel">אפריל 2026</b>
         <button class="nav-btn" onclick="changeMonth(1)">◂</button>
     </div>
 
-    <div id="page-home" class="page active">
-        <div class="main-stats">
-            <div class="stat-card wide">
-                <div style="border-left: 1px solid var(--glass-border)"><label>יתרה נוכחית</label><b id="bCurrent" class="money">₪0</b></div>
-                <div><label>לאחר קבועות</label><b id="bTotal" class="money">₪0</b></div>
-            </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <label>יתרה נוכחית</label>
+            <b id="bCurrent">₪0</b>
         </div>
-        <div id="list-home"></div>
+        <div class="stat-card">
+            <label>לאחר קבועות</label>
+            <b id="bTotal">₪0</b>
+        </div>
     </div>
 
-    <div id="page-stats" class="page">
-        <div id="statsPageContent"></div>
+    <div id="mainList" style="text-align: center; color: var(--text-dim); margin-top: 40px;">
+        אין נתונים
     </div>
 
-    <div id="page-charts" class="page">
-        <div style="background:var(--glass); padding:20px; border-radius:20px; margin-bottom:15px;"><canvas id="barChart"></canvas></div>
-        <div style="background:var(--glass); padding:20px; border-radius:20px; display:flex; justify-content:center;"><div style="max-width:200px; width:100%;"><canvas id="pieChart"></canvas></div></div>
+    <div style="text-align: center; font-size: 0.7rem; color: var(--text-dim); margin-top: 50px; letter-spacing: 1px;">
+        ALEXANDER-ZAVODISKER 2026 ©
     </div>
-
-    <div style="text-align:center; font-size:0.7rem; color:var(--text-dim); margin-top:20px;">© 2026 ALEXANDER-ZAVODISKER</div>
 </div>
 
 <nav class="bottom-nav">
-    <div class="nav-item active" onclick="showPage('home', this)"><span>🏠</span><label>בית</label></div>
-    <div class="nav-item" onclick="showPage('charts', this)"><span>📊</span><label>גרפים</label></div>
-    <div class="nav-item" onclick="showPage('stats', this)"><span>📈</span><label>סיכום</label></div>
+    <div class="nav-link active"><i>🏠</i>בית</div>
+    <div class="nav-link"><i>📊</i>גרפים</div>
+    <div class="nav-link"><i>📈</i>סיכום</div>
 </nav>
 
-<div class="fab" id="mainFab" onclick="toggleFab()">+</div>
+<button class="fab">+</button>
 
 <script>
-const firebaseConfig = {
-    apiKey: "AIzaSyAZ2-EJjvIbDvtKLwKg3LObkIAs8sNhyjU",
-    authDomain: "managermoney-49d0e.firebaseapp.com",
-    projectId: "managermoney-49d0e",
-    databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
-};
-firebase.initializeApp(firebaseConfig);
+    // הגדרות Firebase שלך
+    const firebaseConfig = {
+        apiKey: "AIzaSyAZ2-EJjvIbDvtKLwKg3LObkIAs8sNhyjU",
+        authDomain: "managermoney-49d0e.firebaseapp.com",
+        projectId: "managermoney-49d0e",
+        databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
+    };
+    firebase.initializeApp(firebaseConfig);
 
-let db, entries = [], viewDate = new Date(), isPrivate = false, charts = {};
+    function loginGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithPopup(provider);
+    }
 
-function loginGoogle() { const provider = new firebase.auth.GoogleAuthProvider(); firebase.auth().signInWithPopup(provider); }
-function loginAnon() { firebase.auth().signInAnonymously(); }
-
-function init() {
     firebase.auth().onAuthStateChanged(user => {
-        if(user) {
+        if (user) {
             document.getElementById('loginScreen').classList.add('hidden');
-            db = firebase.database().ref('users/' + user.uid + '/data');
-            if(!user.isAnonymous) {
-                document.getElementById('userChip').style.display = 'flex';
-                document.getElementById('userName').innerText = user.displayName.split(' ')[0];
-                document.getElementById('userAvatar').src = user.photoURL;
-            }
-            db.on('value', snap => {
-                entries = snap.val() ? Object.values(snap.val()) : [];
-                document.getElementById('statusDot').className = 'status-dot online';
-                document.getElementById('statusText').innerText = 'מחובר ✓';
-                render();
-            });
+            document.getElementById('statusDot').classList.add('online');
+            document.getElementById('statusText').innerText = 'מחובר';
+            // כאן תוכל להוסיף טעינת נתונים מה-Database
         } else {
             document.getElementById('loginScreen').classList.remove('hidden');
         }
     });
-}
 
-function render() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', {month:'long', year:'numeric'}).format(viewDate);
-
-    const monthEntries = entries.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
-    });
-    const fixedEntries = entries.filter(e => e.type === 'fixed');
-
-    let inc = 0, exp = 0, fix = 0;
-    monthEntries.forEach(e => e.type === 'income' ? inc += e.amount : exp += e.amount);
-    fixedEntries.forEach(e => fix += e.amount);
-
-    document.getElementById('bCurrent').innerText = `₪${(inc - exp).toLocaleString()}`;
-    document.getElementById('bTotal').innerText = `₪${(inc - exp - fix).toLocaleString()}`;
-
-    const list = document.getElementById('list-home');
-    const all = [...monthEntries, ...fixedEntries].sort((a,b) => new Date(b.date) - new Date(a.date));
-    
-    list.innerHTML = all.length ? all.map(e => `
-        <div class="item">
-            <div>${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''} <b>${e.desc}</b><br><small style="color:var(--text-dim)">${e.date || ''}</small></div>
-            <div style="display:flex; align-items:center;">
-                <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
-                <span class="trash-btn" onclick="deleteEntry('${e.id}')">🗑️</span>
-            </div>
-        </div>
-    `).join('') : '<p style="text-align:center;color:var(--text-dim);padding:20px">אין נתונים</p>';
-
-    if(document.getElementById('page-stats').classList.contains('active')) renderStats();
-    if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
-    applyPrivacyUI();
-}
-
-function saveEntry() {
-    const id = Date.now().toString();
-    const type = document.getElementById('fType').value;
-    const amount = parseFloat(document.getElementById('fAmount').value);
-    if(!amount) return;
-    
-    db.child(id).set({
-        id, desc: document.getElementById('fDesc').value || 'ללא תיאור',
-        amount, type, date: type === 'fixed' ? '' : document.getElementById('fDate').value
-    });
-    toggleFab();
-}
-
-function deleteEntry(id) { if(confirm('למחוק?')) db.child(id).remove(); }
-
-function renderStats() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    const curMonthE = entries.filter(e => { const d = new Date(e.date); return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed'; });
-    const fixedE = entries.filter(e => e.type === 'fixed');
-    
-    const inc = curMonthE.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-    const exp = curMonthE.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-    const fix = fixedE.reduce((s,e)=>s+e.amount,0);
-    const totalExp = exp + fix;
-    const rate = inc > 0 ? Math.min(100, Math.round((totalExp/inc)*100)) : 0;
-
-    document.getElementById('statsPageContent').innerHTML = `
-        <div class="big-stats-grid">
-            <div class="big-stat"><div class="big-stat-num" style="color:var(--income)">₪${inc.toLocaleString()}</div><div class="big-stat-lbl">הכנסות</div></div>
-            <div class="big-stat"><div class="big-stat-num" style="color:var(--expense)">₪${totalExp.toLocaleString()}</div><div class="big-stat-lbl">הוצאות</div></div>
-        </div>
-        <div class="savings-bar-wrap">
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem;"><span>ניצול תקציב</span><b>${rate}%</b></div>
-            <div class="savings-bar-bg"><div class="savings-bar-fill" style="width:${rate}%; background:${rate > 90 ? 'var(--expense)' : 'var(--income)'}"></div></div>
-        </div>
-    `;
-}
-
-function updateCharts() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    const cur = entries.filter(e => { const d = new Date(e.date); return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed'; });
-    const inc = cur.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-    const exp = cur.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-    const fix = entries.filter(e => e.type === 'fixed').reduce((s,e)=>s+e.amount,0);
-
-    if(charts.bar) charts.bar.destroy();
-    charts.bar = new Chart(document.getElementById('barChart'), {
-        type: 'bar',
-        data: { labels: ['הכנסות', 'הוצאות', 'קבועות'], datasets: [{ data: [inc, exp, fix], backgroundColor: ['#10b981', '#f43f5e', '#8b5cf6'] }] },
-        options: { plugins: { legend: { display: false } } }
-    });
-
-    if(charts.pie) charts.pie.destroy();
-    charts.pie = new Chart(document.getElementById('pieChart'), {
-        type: 'doughnut',
-        data: { labels: ['הכנסות', 'הוצאות', 'קבועות'], datasets: [{ data: [inc, exp, fix], backgroundColor: ['#10b981', '#f43f5e', '#8b5cf6'], borderWidth: 0 }] },
-        options: { plugins: { legend: { display: false } }, cutout: '75%' }
-    });
-}
-
-function togglePrivacy() { isPrivate = !isPrivate; document.getElementById('eyeBtn').classList.toggle('active'); render(); }
-function applyPrivacyUI() { document.querySelectorAll('.money').forEach(el => isPrivate ? el.classList.add('blur') : el.classList.remove('blur')); }
-function toggleFab() { document.getElementById('sheet').classList.toggle('open'); document.getElementById('overlay').style.display = document.getElementById('overlay').style.display === 'block' ? 'none' : 'block'; }
-function closeAllSheets() { document.getElementById('sheet').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; }
-function changeMonth(n) { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1); render(); }
-function toggleDateField() { document.getElementById('fDate').style.display = document.getElementById('fType').value === 'fixed' ? 'none' : 'block'; }
-function showPage(p, el) {
-    document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-    document.getElementById('page-' + p).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
-    el.classList.add('active');
-    render();
-}
-
-init();
+    function changeMonth(n) {
+        // לוגיקה לשינוי חודש
+    }
 </script>
+
 </body>
 </html>
