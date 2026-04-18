@@ -471,7 +471,7 @@ function init() {
             updateUserUI(user);
             db = firebase.database().ref('users/' + user.uid + '/data');
             document.getElementById('statusDot').className = 'status-dot online';
-            document.getElementById('statusText').innerText = user.isAnonymous ? 'לא מקוון' : 'מחובר ✓';
+            document.getElementById('statusText').innerText = user.isAnonymous ? 'אורח מחובר' : 'מחובר ✓';
             db.on('value', snap => {
                 entries = snap.val() ? Object.values(snap.val()) : [];
                 render();
