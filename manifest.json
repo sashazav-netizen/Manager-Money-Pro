@@ -1,48 +1,17 @@
 {
   "name": "Manager Money Pro",
   "short_name": "ManagerMoney",
-  "description": "ניהול תקציב אישי חכם - הכנסות, הוצאות וקבועות",
+  "description": "ניהול תקציב אישי חכם — הכנסות, הוצאות וסטטיסטיקה",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#050810",
   "theme_color": "#050810",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "lang": "he",
   "dir": "rtl",
   "categories": ["finance", "productivity"],
   "icons": [
-
-    {
-    
-      "src": "icons/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-180.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    },
     {
       "src": "icons/icon-192.png",
       "sizes": "192x192",
@@ -54,16 +23,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [],
-  "shortcuts": [
-    {
-      "name": "הוסף הוצאה",
-      "short_name": "הוצאה",
-      "description": "הוסף הוצאה חדשה",
-      "url": "./index.html",
-      "icons": [{ "src": "icons/icon-96.png", "sizes": "96x96" }]
     }
   ]
 }
