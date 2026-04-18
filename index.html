@@ -8,8 +8,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Manager Money">
-    <meta name="description" content="ניהול תקציב אישי חכם">
     <link rel="manifest" href="manifest.json">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -38,14 +36,11 @@
         body { 
             margin: 0; padding: 10px; background: var(--bg); color: var(--text); min-height: 100vh;
             background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
-            background-attachment: fixed;
-            overflow-x: hidden;
+            background-attachment: fixed; overflow-x: hidden;
         }
 
         .container { max-width: 500px; margin: 0 auto; padding-bottom: 120px; }
-
         header { padding: 25px 0 15px 0; text-align: center; position: relative; }
-        
         .brand { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 20px; }
         .brand span.diamond-logo { font-size: 2.2rem; filter: drop-shadow(0 0 10px rgba(167, 139, 250, 0.4)); }
         .brand h1 { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; margin: 0; font-weight: 900; color: white; }
@@ -53,22 +48,10 @@
 
         .privacy-toast {
             position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-10px);
-            background: rgba(14, 165, 233, 0.15); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: #38bdf8; 
-            padding: 8px 20px; 
-            border-radius: 25px;
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            font-weight: 700; 
-            font-size: 0.85rem; 
-            display: flex; 
-            align-items: center; 
-            gap: 8px;
-            z-index: 5000;
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            background: rgba(14, 165, 233, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: #38bdf8; padding: 8px 20px; border-radius: 25px; border: 1px solid rgba(56, 189, 248, 0.3);
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; z-index: 5000;
+            opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
         .privacy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -96,24 +79,14 @@
         .stat-card label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; font-weight: 800; }
         .stat-card b { font-size: 1.25rem; }
 
-        .card-inc { border-bottom: 3px solid var(--income); }
-        .card-exp { border-bottom: 3px solid var(--expense); }
-        .val-current { color: var(--accent); text-shadow: 0 0 10px rgba(14, 165, 233, 0.3); }
-        .val-final { color: var(--balance-final); text-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
-
         .money.blur { filter: blur(12px) !important; pointer-events: none; opacity: 0.6; }
 
         .item { 
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; 
             padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
+        .fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
         .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; }
-
-        .footer-copyright {
-            text-align: center; font-size: 0.7rem; color: var(--text-dim);
-            padding: 15px 0 90px 0; font-weight: 700; letter-spacing: 1px;
-        }
 
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
@@ -138,148 +111,41 @@
         }
         .sheet.open { bottom: 0; }
         
-        input, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: white; margin-bottom: 12px; outline: none; transition: 0.3s; }
-        input.error { border-color: var(--expense); background: rgba(244, 63, 94, 0.1); }
+        input, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: white; margin-bottom: 12px; outline: none; }
+        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; }
         
-        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; font-family: 'Heebo', sans-serif; font-size: 1rem; }
-        .btn-cancel { width: 100%; padding: 12px; background: none; border: 1px solid var(--expense); border-radius: 15px; color: var(--expense); font-weight: 800; margin-top: 10px; cursor: pointer; font-family: 'Heebo', sans-serif; font-size: 0.9rem; }
-
         .confirm-box { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: #1e293b; padding: 25px; border-radius: 25px; border: 1px solid var(--glass-border);
             width: 85%; max-width: 320px; z-index: 3000; display: none; text-align: center;
         }
 
-        .page { display: none; }
-        .page.active { display: block; }
-
-        .chart-box { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; }
-        .pie-container { max-width: 170px; width: 100%; margin-bottom: 20px; }
-        .settings-btn { width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-
-        /* ── LOGIN SCREEN ───────────────────────────── */
         .login-screen {
             position: fixed; inset: 0; z-index: 9999;
             background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 30px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
         }
         .login-screen.hidden { display: none; }
-        .login-logo { font-size: 5rem; margin-bottom: 10px;
-            filter: drop-shadow(0 0 20px rgba(167,139,250,0.5)); }
-        .login-title { font-family: 'Montserrat', sans-serif; font-size: 2rem;
-            font-weight: 900; color: white; margin-bottom: 6px; }
-        .login-title span { color: #38bdf8; }
-        .login-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 40px; line-height: 1.6; }
-        .login-btn {
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            width: 100%; max-width: 320px; padding: 16px 24px;
-            background: white; color: #1a1a2e;
-            border: none; border-radius: 16px; cursor: pointer;
-            font-size: 1rem; font-weight: 800; font-family: 'Heebo', sans-serif;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4); transition: 0.2s;
-            margin-bottom: 14px;
-        }
-        .login-btn:active { transform: scale(0.97); }
-        .login-btn-google { background: white; }
-        .login-btn-anon {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: var(--text-dim); font-size: 0.85rem;
-            box-shadow: none;
-        }
-        .login-footer { font-size: 0.65rem; color: var(--text-dim);
-            margin-top: 30px; line-height: 1.6; max-width: 280px; }
-        .user-chip {
-            display: flex; align-items: center; gap: 8px;
-            background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 4px 12px 4px 6px;
-            font-size: 0.7rem; color: var(--text-dim); cursor: pointer;
-        }
+        .user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: var(--text-dim); }
         .user-chip img { width: 22px; height: 22px; border-radius: 50%; }
-        .user-chip span { font-weight: 700; }
 
-        /* ── STATISTICS PAGE ────────────────────────── */
+        .page { display: none; }
+        .page.active { display: block; }
+        
+        /* Statistics Styling */
         .stats-section { margin-bottom: 18px; }
-        .stats-section-title {
-            font-size: 0.75rem; font-weight: 900; color: var(--text-dim);
-            letter-spacing: 1px; text-transform: uppercase;
-            margin-bottom: 10px; padding-right: 4px;
-        }
-        .stat-row {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 14px; padding: 13px 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 8px;
-        }
-        .stat-row-label { font-size: 0.85rem; color: var(--text-dim); }
-        .stat-row-val { font-size: 0.95rem; font-weight: 900; }
-        .trend-up   { color: var(--income); }
-        .trend-down { color: var(--expense); }
-        .trend-same { color: var(--text-dim); }
-        .trend-arrow { font-size: 0.75rem; margin-right: 4px; }
-        .big-stat {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 18px; padding: 18px;
-            text-align: center; margin-bottom: 10px;
-        }
-        .big-stat-num { font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
-        .big-stat-lbl { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
+        .stat-row { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; margin-bottom: 8px; }
         .big-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
-        .top-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 14px;
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 12px; margin-bottom: 7px;
-            font-size: 0.85rem;
-        }
-        .top-item-name { color: var(--text); font-weight: 600; }
-        .top-item-val  { font-weight: 900; color: var(--expense); }
-        .savings-bar-wrap {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 18px; padding: 16px; margin-bottom: 10px;
-        }
-        .savings-bar-top {
-            display: flex; justify-content: space-between;
-            font-size: 0.8rem; margin-bottom: 10px;
-        }
-        .savings-bar-bg {
-            background: rgba(255,255,255,0.06);
-            border-radius: 999px; height: 12px; overflow: hidden;
-        }
-        .savings-bar-fill {
-            height: 100%; border-radius: 999px;
-            transition: width 1s cubic-bezier(.4,0,.2,1);
-        }
+        .big-stat { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 18px; text-align: center; }
     </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
 <div class="login-screen" id="loginScreen">
-    <div class="login-logo">💎</div>
-    <div class="login-title">Manager<span>Money</span></div>
-    <div class="login-sub">ניהול תקציב אישי חכם<br>הנתונים שלך מסונכרנים בענן בזמן אמת</div>
-
-    <button class="login-btn login-btn-google" onclick="loginGoogle()">
-        <svg width="22" height="22" viewBox="0 0 48 48">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-        </svg>
-        התחבר עם Google
-    </button>
-
-    <button class="login-btn login-btn-anon" onclick="loginAnon()">
-        👤 המשך ללא חשבון
-    </button>
-
-    <div class="login-footer">
-        בהתחברות עם Google הנתונים שלך מסונכרנים<br>
-        בין כל המכשירים שלך באופן אוטומטי 🔒
-    </div>
+    <div style="font-size: 5rem; margin-bottom: 10px;">💎</div>
+    <h1 style="color:white; font-family:'Montserrat';">Manager<span style="color:#38bdf8">Money</span></h1>
+    <button class="btn-main" onclick="loginGoogle()" style="max-width:300px; background:white; color:#1a1a2e; margin-top:20px;">התחבר עם Google</button>
+    <button onclick="loginAnon()" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer;">המשך ללא חשבון 👤</button>
 </div>
 
 <div class="privacy-toast" id="privacyToast">
@@ -299,29 +165,18 @@
 </div>
 
 <div class="sheet" id="sheet">
-    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px;">פעולה</h2>
-    <input type="text" id="fDesc" placeholder="תיאור (למשל: סופרמרקט)">
+    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px; color:white;">פעולה</h2>
+    <input type="text" id="fDesc" placeholder="תיאור">
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
         <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal">
         <select id="fType" onchange="toggleDateField()">
-            <option value="expense" selected>💸 הוצאה</option>
+            <option value="expense">💸 הוצאה</option>
             <option value="income">💰 הכנסה</option>
-            <option value="fixed">🔄 קבועה (אוטומטי)</option>
+            <option value="fixed">🔄 קבועה</option>
         </select>
     </div>
     <input type="date" id="fDate">
     <button class="btn-main" onclick="validateAndAsk()">שמור</button>
-    <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
-</div>
-
-<div class="sheet" id="settingsSheet">
-    <h2 style="text-align:center; margin-bottom:20px;">הגדרות וגיבוי</h2>
-    <button class="settings-btn" onclick="exportToCSV()"><span>📊</span> ייצוא נתוני חודש לאקסל (CSV)</button>
-    <button class="settings-btn" onclick="exportToJSON()"><span>💾</span> גיבוי מסד נתונים מלא (JSON)</button>
-    <button class="settings-btn" onclick="triggerImportJSON()"><span>📂</span> שחזור מגיבוי (JSON)</button>
-    <input type="file" id="importJsonFile" accept=".json" style="display:none">
-    <div style="text-align:center; margin-top:20px; color:var(--text-dim); font-size:0.8rem;">סנכרון ענן אוטומטי פעיל ✅</div>
-    <button class="btn-cancel" onclick="toggleSettings()">סגור</button>
 </div>
 
 <div class="container">
@@ -330,15 +185,12 @@
             <span class="diamond-logo">💎</span>
             <h1>Manager<span class="accent">Money</span></h1>
         </div>
-        
         <div class="header-tools">
-            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()" title="מצב פרטיות">👁️</button>
-            <button class="tool-btn" onclick="toggleSettings()" title="הגדרות">⚙️</button>
-            <div id="userChip" class="user-chip" onclick="showLogoutConfirm()" style="display:none">
-                <img id="userAvatar" src="" alt="">
-                <span id="userName"></span>
+            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()">👁️</button>
+            <div id="userChip" class="user-chip" style="display:none" onclick="showLogoutConfirm()">
+                <img id="userAvatar" src=""><span id="userName"></span>
             </div>
-            <div class="cloud-status" id="cloudStatus">
+            <div class="cloud-status">
                 <div id="statusDot" class="status-dot"></div>
                 <span id="statusText">Cloud Sync</span>
             </div>
@@ -354,51 +206,25 @@
     <div id="page-home" class="page active">
         <div class="main-stats">
             <div class="stat-card wide">
-                <div style="border-left: 1px solid var(--glass-border)"><label>יתרה נוכחית</label><b id="bCurrent" class="money val-current">₪0</b></div>
-                <div><label>יתרה לאחר קבועות</label><b id="bTotal" class="money val-final">₪0</b></div>
-            </div>
-            <div class="stat-card card-inc">
-                <label style="color:var(--income)">הכנסות ↗️</label>
-                <b id="bInc" class="money" style="color:var(--income)">₪0</b>
-            </div>
-            <div class="stat-card card-exp">
-                <label style="color:var(--expense)">הוצאות ↘️</label>
-                <b id="bExp" class="money" style="color:var(--expense)">₪0</b>
+                <div><label>יתרה נוכחית</label><b id="bCurrent" class="money">₪0</b></div>
+                <div><label>לאחר קבועות</label><b id="bTotal" class="money">₪0</b></div>
             </div>
         </div>
         <div id="list-home"></div>
     </div>
 
-    <div id="page-income" class="page"><div id="list-income"></div></div>
-    <div id="page-expense" class="page"><div id="list-expense"></div></div>
-    <div id="page-fixed" class="page"><div id="list-fixed"></div></div>
+    <div id="page-stats" class="page"><div id="statsPageContent"></div></div>
     <div id="page-charts" class="page">
-        <div id="chartsEmpty" style="display:none;text-align:center;padding:60px 20px;color:var(--text-dim)">
-            <div style="font-size:3rem;margin-bottom:15px">📊</div>
-            <div style="font-weight:700;font-size:1rem;margin-bottom:8px">אין נתונים להצגה</div>
-            <div style="font-size:0.8rem">הוסף הכנסות והוצאות כדי לראות גרפים</div>
-        </div>
-        <div id="chartsContent">
-            <div class="chart-box"><canvas id="barChart"></canvas></div>
-            <div class="chart-box">
-                <div class="pie-container"><canvas id="pieChart"></canvas></div>
-            </div>
+        <div class="chart-box" style="background:var(--glass); padding:20px; border-radius:20px; margin-bottom:20px;">
+            <canvas id="barChart"></canvas>
         </div>
     </div>
 
-    <!-- STATISTICS PAGE -->
-    <div id="page-stats" class="page">
-        <div id="statsPageContent"></div>
-    </div>
-
-    <div class="footer-copyright">© 2026 ALEXANDER-ZAVODISKER</div>
+    <div class="footer-copyright" style="text-align:center; padding:20px; color:var(--text-dim); font-size:0.7rem;">© 2026 ALEXANDER ZAVODISKER</div>
 </div>
 
 <nav class="bottom-nav">
     <div class="nav-item active" onclick="showPage('home', this)"><span>🏠</span><label>בית</label></div>
-    <div class="nav-item" onclick="showPage('income', this)" style="color:var(--income)"><span>↗️</span><label>הכנסות</label></div>
-    <div class="nav-item" onclick="showPage('expense', this)" style="color:var(--expense)"><span>↘️</span><label>הוצאות</label></div>
-    <div class="nav-item" onclick="showPage('fixed', this)" style="color:var(--fixed)"><span>🔄</span><label>קבועות</label></div>
     <div class="nav-item" onclick="showPage('charts', this)"><span>📊</span><label>גרפים</label></div>
     <div class="nav-item" onclick="showPage('stats', this)"><span>📈</span><label>סטטיסטיקה</label></div>
 </nav>
@@ -412,617 +238,170 @@ const firebaseConfig = {
     projectId: "managermoney-49d0e",
     databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
 };
+
 firebase.initializeApp(firebaseConfig);
-const _saved = sessionStorage.getItem('mm_viewDate');
-let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
+let db, entries = [], viewDate = new Date(), isPrivate = false, editId = null, isFabOpen = false, pendingAction = null, charts = {};
 
-// ── LOGIN FUNCTIONS ──────────────────────────────────────
-function loginGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-    firebase.auth().signInWithPopup(provider)
-        .catch(err => {
-            // Popup blocked on mobile — try redirect
-            if(err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
-                firebase.auth().signInWithRedirect(provider);
-            } else {
-                showToast('❌ שגיאה בהתחברות', 'var(--expense)');
-            }
-        });
-}
-
-function loginAnon() {
-    firebase.auth().signInAnonymously()
-        .catch(() => showToast('❌ שגיאת חיבור', 'var(--expense)'));
-}
-
-function showLogoutConfirm() {
-    if(confirm('להתנתק מהחשבון?')) {
-        firebase.auth().signOut();
-    }
-}
-
-function updateUserUI(user) {
-    const chip   = document.getElementById('userChip');
-    const avatar = document.getElementById('userAvatar');
-    const name   = document.getElementById('userName');
-    const cloud  = document.getElementById('cloudStatus');
-    if(user && !user.isAnonymous) {
-        chip.style.display = 'flex';
-        cloud.style.display = 'none';
-        avatar.src = user.photoURL || '';
-        avatar.style.display = user.photoURL ? 'block' : 'none';
-        name.textContent = user.displayName ? user.displayName.split(' ')[0] : 'משתמש';
-    } else {
-        chip.style.display = 'none';
-        cloud.style.display = 'flex';
+// --- סנכרון ענן חכם ---
+async function executeConfirmed() {
+    try {
+        if(pendingAction === 'save') {
+            const id = editId || Date.now().toString();
+            const type = document.getElementById('fType').value;
+            const newData = {
+                id,
+                desc: document.getElementById('fDesc').value.trim(),
+                amount: parseFloat(document.getElementById('fAmount').value),
+                type,
+                date: type === 'fixed' ? '' : document.getElementById('fDate').value
+            };
+            await db.child(id).set(newData);
+            showToast('✅ סונכרן לענן', 'var(--income)');
+        } else if(pendingAction === 'delete') {
+            await db.child(editId).remove();
+            showToast('🗑️ נמחק מהענן', null);
+        }
+        closeConfirm();
+        if(isFabOpen) toggleFab();
+    } catch (e) {
+        showToast('❌ שגיאת חיבור', 'var(--expense)');
     }
 }
 
 function init() {
-    // Handle Google redirect result first
-    firebase.auth().getRedirectResult().catch(() => {});
-
-    // Listen to auth state changes
     firebase.auth().onAuthStateChanged(user => {
         if(user) {
-            // User is logged in — hide login screen, load data
             document.getElementById('loginScreen').classList.add('hidden');
-            updateUserUI(user);
             db = firebase.database().ref('users/' + user.uid + '/data');
-            document.getElementById('statusDot').className = 'status-dot online';
-            document.getElementById('statusText').innerText = user.isAnonymous ? 'אורח מחובר' : 'מחובר ✓';
+            updateUserUI(user);
             db.on('value', snap => {
                 entries = snap.val() ? Object.values(snap.val()) : [];
+                document.getElementById('statusDot').className = 'status-dot online';
                 render();
-                if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
             });
         } else {
-            // Not logged in — show login screen
             document.getElementById('loginScreen').classList.remove('hidden');
-            if(db) db.off();
-            db = null;
-            entries = [];
         }
     });
 }
 
-function validateAndAsk() {
-    const desc = document.getElementById('fDesc');
-    const amount = document.getElementById('fAmount');
-    let valid = true;
-    [desc, amount].forEach(el => el.classList.remove('error'));
-    if (!desc.value.trim()) { desc.classList.add('error'); valid = false; }
-    if (!amount.value || parseFloat(amount.value) <= 0) { amount.classList.add('error'); valid = false; }
-    if (!valid) return;
-    askSaveConfirm();
-}
-
-function togglePrivacy() {
-    isPrivate = !isPrivate;
-    document.getElementById('eyeBtn').classList.toggle('active');
-    const toast = document.getElementById('privacyToast');
-    const toastText = document.getElementById('toastText');
-    const toastIcon = document.getElementById('toastIcon');
-    if (isPrivate) { toastText.innerText = "מצב פרטיות פעיל"; toastIcon.innerText = "🔒"; }
-    else { toastText.innerText = "תצוגה רגילה"; toastIcon.innerText = "👁️"; }
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
-    applyPrivacyUI();
-}
-
-function applyPrivacyUI() {
-    document.querySelectorAll('.money').forEach(el => isPrivate ? el.classList.add('blur') : el.classList.remove('blur'));
-}
-
+// --- פונקציות עזר ותצוגה ---
 function render() {
     const m = viewDate.getMonth(), y = viewDate.getFullYear();
     document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', {month:'long', year:'numeric'}).format(viewDate);
 
-    // ════ תיקון 1: קבועות מוצגות תמיד, אבל מסוננות בנפרד ══════════
-    // הכנסות והוצאות — רק של החודש הנוכחי
     const monthEntries = entries.filter(e => {
+        if(e.type === 'fixed') return false;
         const d = new Date(e.date);
-        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
+        return d.getMonth() === m && d.getFullYear() === y;
     });
-    // קבועות — תמיד כולן (הן לא תלויות חודש)
     const fixedEntries = entries.filter(e => e.type === 'fixed');
 
     let inc = 0, exp = 0, fix = 0;
-    monthEntries.forEach(e => {
-        if(e.type === 'income') inc += e.amount;
-        else if(e.type === 'expense') exp += e.amount;
-    });
+    monthEntries.forEach(e => e.type === 'income' ? inc += e.amount : exp += e.amount);
     fixedEntries.forEach(e => fix += e.amount);
 
-    document.getElementById('bInc').innerText = `₪${inc.toLocaleString()}`;
-    document.getElementById('bExp').innerText = `₪${exp.toLocaleString()}`;
     document.getElementById('bCurrent').innerText = `₪${(inc - exp).toLocaleString()}`;
     document.getElementById('bTotal').innerText = `₪${(inc - exp - fix).toLocaleString()}`;
 
-    // רשימת בית = פריטי החודש + קבועות
     renderList('list-home', [...monthEntries, ...fixedEntries]);
-    renderList('list-income', monthEntries.filter(e => e.type === 'income'));
-    renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
-    renderList('list-fixed', fixedEntries);
-    applyPrivacyUI();
-    // כותרת דינמית עם יתרה
-    const balance = inc - exp - fix;
-    document.title = `₪${balance.toLocaleString()} | Manager Money`;
-}
-
-function safe(s) {
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    if(document.getElementById('page-stats').classList.contains('active')) renderStats();
 }
 
 function renderList(id, data) {
-    const el = document.getElementById(id); if(!el) return;
-    if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
-    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
+    const el = document.getElementById(id);
+    el.innerHTML = data.map(e => `
         <div class="item">
-            <div onclick="openEdit('${e.id}')" style="flex:1;cursor:pointer;">
-                ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
-                <b>${safe(e.desc)}</b><br><small style="color:var(--text-dim)">${e.date || '—'}</small>
+            <div onclick="openEdit('${e.id}')">
+                ${e.type === 'fixed' ? '<span class="fixed-tag">קבוע</span>' : ''}
+                <b>${e.desc}</b><br><small>${e.date || ''}</small>
             </div>
-            <div style="display:flex; align-items:center;">
+            <div>
                 <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
-                <span class="trash-btn" onclick="event.stopPropagation();askDeleteConfirm('${e.id}')">🗑️</span>
+                <span class="trash-btn" onclick="askDeleteConfirm('${e.id}')">🗑️</span>
             </div>
         </div>
     `).join('');
 }
 
+function changeMonth(n) {
+    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
+    render();
+}
+
 function toggleFab() {
     isFabOpen = !isFabOpen;
-    document.getElementById('mainFab').classList.toggle('open');
     document.getElementById('sheet').classList.toggle('open');
-    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
-    if(!isFabOpen) { editId = null; resetForm(); }
-}
-
-function toggleSettings() {
-    isSettingsOpen = !isSettingsOpen;
-    document.getElementById('settingsSheet').classList.toggle('open');
-    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
-}
-
-function closeAllSheets() { if(isFabOpen) toggleFab(); if(isSettingsOpen) toggleSettings(); }
-
-function toggleDateField() {
-    const type = document.getElementById('fType').value;
-    document.getElementById('fDate').style.display = type === 'fixed' ? 'none' : 'block';
+    document.getElementById('overlay').style.display = isFabOpen ? 'block' : 'none';
+    if(!isFabOpen) resetForm();
 }
 
 function resetForm() {
-    document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = '';
-    document.getElementById('fType').value = 'expense'; document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
-    toggleDateField();
-    document.getElementById('modalTitle').innerText = 'פעולה חדשה';
-    document.getElementById('fDesc').classList.remove('error');
-    document.getElementById('fAmount').classList.remove('error');
+    editId = null;
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fAmount').value = '';
+    document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 }
 
-function openEdit(id) {
-    editId = id;
-    const e = entries.find(x => x.id === id);
-    if(!e) return; // safety: item not found
-    document.getElementById('fDesc').value = e.desc;
-    document.getElementById('fAmount').value = e.amount;
-    document.getElementById('fType').value = e.type;
-    document.getElementById('fDate').value = e.date || '';
-    toggleDateField(); // show/hide date based on type
-    document.getElementById('modalTitle').innerText = 'עריכת פעולה';
-    toggleFab();
+function validateAndAsk() {
+    if(!document.getElementById('fDesc').value || !document.getElementById('fAmount').value) return;
+    pendingAction = 'save';
+    executeConfirmed();
 }
 
-function askSaveConfirm() { pendingAction = 'save'; showConfirm("שמירה", "לעדכן את הנתונים לענן?", "var(--accent)"); }
 function askDeleteConfirm(id) {
     editId = id;
     pendingAction = 'delete';
-    const e = entries.find(x => x.id === id);
-    const name = e ? safe(e.desc) : 'פעולה זו';
-    showConfirm("מחיקה", `למחוק את "${name}"?`, "var(--expense)");
+    showConfirm("מחיקה", "האם למחוק את הפעולה?", "var(--expense)");
 }
 
-function showConfirm(title, msg, color) {
-    document.getElementById('confirmTitle').innerText = title; document.getElementById('confirmMsg').innerText = msg;
-    document.getElementById('confirmExecBtn').style.background = color; document.getElementById('confirmBox').style.display = 'block';
-    document.getElementById('overlay').style.zIndex = '2500'; document.getElementById('overlay').style.display = 'block';
-}
-
-function executeConfirmed() {
-    if(pendingAction === 'save') {
-        const id = editId || Date.now().toString();
-        const type = document.getElementById('fType').value;
-        // קבועות נשמרות בלי תאריך ספציפי
-        const date = type === 'fixed' ? '' : document.getElementById('fDate').value;
-        db.child(id).set({
-            id,
-            desc: document.getElementById('fDesc').value,
-            amount: Math.round(parseFloat(document.getElementById('fAmount').value) * 100) / 100,
-            type,
-            date
-        }).then(() => {
-            showToast('✅ נשמר בהצלחה', 'var(--income)');
-        }).catch(() => {
-            showToast('❌ שגיאה בשמירה — בדוק חיבור', 'var(--expense)');
-        });
-    } else if(pendingAction === 'delete') {
-        const delId = editId;
-        editId = null;
-        db.child(delId).remove()
-            .then(() => showToast('🗑️ נמחק בהצלחה', null))
-            .catch(() => showToast('❌ שגיאה במחיקה', 'var(--expense)'));
-    }
-    closeConfirm(); if(isFabOpen) toggleFab();
+function showConfirm(t, m, c) {
+    document.getElementById('confirmTitle').innerText = t;
+    document.getElementById('confirmMsg').innerText = m;
+    document.getElementById('confirmExecBtn').style.background = c;
+    document.getElementById('confirmBox').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
 }
 
 function closeConfirm() {
     document.getElementById('confirmBox').style.display = 'none';
-    document.getElementById('overlay').style.zIndex = '2000';
-    if(!isFabOpen && !isSettingsOpen) document.getElementById('overlay').style.display = 'none';
-}
-
-
-// ── STATISTICS ───────────────────────────────────────────
-function renderStats() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-
-    // חודש נוכחי
-    const curMonthE = entries.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
-    });
-    const fixedE = entries.filter(e => e.type === 'fixed');
-    const curInc = curMonthE.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-    const curExp = curMonthE.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-    const curFix = fixedE.reduce((s,e)=>s+e.amount,0);
-    const curBalance = curInc - curExp - curFix;
-
-    // חודש קודם
-    const prevDate = new Date(y, m-1, 1);
-    const pm = prevDate.getMonth(), py = prevDate.getFullYear();
-    const prevMonthE = entries.filter(e => {
-        const d = new Date(e.date);
-        return d.getMonth() === pm && d.getFullYear() === py && e.type !== 'fixed';
-    });
-    const prevInc = prevMonthE.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
-    const prevExp = prevMonthE.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
-    const prevBalance = prevInc - prevExp - curFix;
-
-    // 6 חודשים אחרונים
-    const last6 = [];
-    for(let i=5; i>=0; i--) {
-        const d = new Date(y, m-i, 1);
-        const me = entries.filter(e => {
-            const ed = new Date(e.date);
-            return ed.getMonth()===d.getMonth() && ed.getFullYear()===d.getFullYear() && e.type!=='fixed';
-        });
-        last6.push({
-            inc: me.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0),
-            exp: me.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0),
-        });
-    }
-    const avgInc6 = Math.round(last6.reduce((s,m)=>s+m.inc,0)/6);
-    const avgExp6 = Math.round(last6.reduce((s,m)=>s+m.exp,0)/6);
-    const bestMonth = last6.reduce((best,m,i)=> m.inc-m.exp > best.val ? {val:m.inc-m.exp,i} : best, {val:-Infinity,i:0});
-
-    // הוצאה גדולה ביותר החודש
-    const expItems = curMonthE.filter(e=>e.type==='expense').sort((a,b)=>b.amount-a.amount);
-    const top3Exp = expItems.slice(0,3);
-
-    // trend helpers
-    function trend(cur, prev) {
-        if(prev===0) return { cls:'trend-same', arrow:'—', pct:'' };
-        const d = ((cur-prev)/prev*100).toFixed(0);
-        if(cur > prev) return { cls:'trend-up', arrow:'↑', pct:`${Math.abs(d)}%` };
-        if(cur < prev) return { cls:'trend-down', arrow:'↓', pct:`${Math.abs(d)}%` };
-        return { cls:'trend-same', arrow:'—', pct:'0%' };
-    }
-
-    const tInc = trend(curInc, prevInc);
-    const tExp = trend(curExp, prevExp);
-    const savingRate = curInc > 0 ? Math.round((curBalance/curInc)*100) : 0;
-    const expRate    = curInc > 0 ? Math.min(100,Math.round(((curExp+curFix)/curInc)*100)) : 0;
-
-    const monthName = new Intl.DateTimeFormat('he-IL',{month:'long'}).format(viewDate);
-    const prevName  = new Intl.DateTimeFormat('he-IL',{month:'long'}).format(prevDate);
-
-    let html = `<div style="font-weight:900;font-size:1.1rem;color:var(--accent);margin-bottom:16px">📈 סטטיסטיקה — ${monthName}</div>`;
-
-    // ── כרטיסי סיכום ──
-    html += `<div class="big-stats-grid">
-        <div class="big-stat">
-            <div class="big-stat-num" style="color:var(--income)">₪${curInc.toLocaleString()}</div>
-            <div class="big-stat-lbl">הכנסות החודש</div>
-        </div>
-        <div class="big-stat">
-            <div class="big-stat-num" style="color:var(--expense)">₪${(curExp+curFix).toLocaleString()}</div>
-            <div class="big-stat-lbl">סה"כ הוצאות</div>
-        </div>
-        <div class="big-stat">
-            <div class="big-stat-num" style="color:${curBalance>=0?'var(--accent)':'var(--expense)'}">
-                ${curBalance<0?'-':''}₪${Math.abs(curBalance).toLocaleString()}
-            </div>
-            <div class="big-stat-lbl">יתרה</div>
-        </div>
-        <div class="big-stat">
-            <div class="big-stat-num" style="color:${savingRate>=0?'var(--income)':'var(--expense)'}">
-                ${savingRate}%
-            </div>
-            <div class="big-stat-lbl">אחוז חיסכון</div>
-        </div>
-    </div>`;
-
-    // ── פס שימוש בתקציב ──
-    const barColor = expRate>90?'#f43f5e':expRate>70?'#f59e0b':'#10b981';
-    html += `<div class="savings-bar-wrap">
-        <div class="savings-bar-top">
-            <span style="font-size:0.8rem;font-weight:700">שימוש בהכנסה</span>
-            <span style="font-weight:900;color:${barColor}">${expRate}%</span>
-        </div>
-        <div class="savings-bar-bg">
-            <div class="savings-bar-fill" style="width:${expRate}%;background:${barColor}"></div>
-        </div>
-        <div style="font-size:0.7rem;color:var(--text-dim);margin-top:8px">
-            ${expRate<=50?'🟢 חיסכון מעולה':expRate<=70?'🟡 חיסכון טוב':expRate<=90?'🟠 שים לב להוצאות':'🔴 חריגה מהתקציב'}
-        </div>
-    </div>`;
-
-    // ── השוואה לחודש קודם ──
-    html += `<div class="stats-section">
-        <div class="stats-section-title">השוואה ל${prevName}</div>
-        <div class="stat-row">
-            <span class="stat-row-label">הכנסות</span>
-            <span class="stat-row-val ${tInc.cls}">
-                <span class="trend-arrow">${tInc.arrow}</span>
-                ${tInc.pct} (₪${curInc.toLocaleString()})
-            </span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">הוצאות</span>
-            <span class="stat-row-val ${tExp.cls==='trend-up'?'trend-down':'trend-up'}">
-                <span class="trend-arrow">${tExp.arrow}</span>
-                ${tExp.pct} (₪${curExp.toLocaleString()})
-            </span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">יתרה לעומת ${prevName}</span>
-            <span class="stat-row-val ${curBalance>=prevBalance?'trend-up':'trend-down'}">
-                ${curBalance>=prevBalance?'↑':'↓'}
-                ₪${Math.abs(curBalance-prevBalance).toLocaleString()}
-            </span>
-        </div>
-    </div>`;
-
-    // ── ממוצעים 6 חודשים ──
-    html += `<div class="stats-section">
-        <div class="stats-section-title">ממוצע 6 חודשים אחרונים</div>
-        <div class="stat-row">
-            <span class="stat-row-label">ממוצע הכנסות חודשי</span>
-            <span class="stat-row-val" style="color:var(--income)">₪${avgInc6.toLocaleString()}</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">ממוצע הוצאות חודשי</span>
-            <span class="stat-row-val" style="color:var(--expense)">₪${avgExp6.toLocaleString()}</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">ממוצע חיסכון חודשי</span>
-            <span class="stat-row-val" style="color:var(--accent)">₪${(avgInc6-avgExp6).toLocaleString()}</span>
-        </div>
-    </div>`;
-
-    // ── הוצאות גדולות ביותר ──
-    if(top3Exp.length > 0) {
-        html += `<div class="stats-section">
-            <div class="stats-section-title">הוצאות גדולות החודש</div>`;
-        top3Exp.forEach((e,i) => {
-            const pct = curExp>0 ? Math.round(e.amount/curExp*100) : 0;
-            html += `<div class="top-item">
-                <span class="top-item-name">${i+1}. ${safe(e.desc)}</span>
-                <span class="top-item-val">₪${e.amount.toLocaleString()} <span style="color:var(--text-dim);font-size:0.7rem">(${pct}%)</span></span>
-            </div>`;
-        });
-        html += `</div>`;
-    }
-
-    // ── מספר פעולות ──
-    html += `<div class="stats-section">
-        <div class="stats-section-title">פעילות החודש</div>
-        <div class="stat-row">
-            <span class="stat-row-label">מספר הכנסות</span>
-            <span class="stat-row-val">${curMonthE.filter(e=>e.type==='income').length} פעולות</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">מספר הוצאות</span>
-            <span class="stat-row-val">${curMonthE.filter(e=>e.type==='expense').length} פעולות</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-row-label">ממוצע הוצאה בודדת</span>
-            <span class="stat-row-val">
-                ₪${expItems.length>0 ? Math.round(curExp/expItems.length).toLocaleString() : 0}
-            </span>
-        </div>
-    </div>`;
-
-    document.getElementById('statsPageContent').innerHTML = html;
+    if(!isFabOpen) document.getElementById('overlay').style.display = 'none';
 }
 
 function showPage(p, el) {
     document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
-    document.getElementById('page-' + p).classList.add('active'); el.classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if(navigator.vibrate) navigator.vibrate(18);
-    if(p === 'charts') updateCharts();
+    document.getElementById('page-' + p).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
     if(p === 'stats') renderStats();
 }
 
-function updateCharts() {
-    // Show empty state if no data at all
-    const hasAny = entries.length > 0;
-    document.getElementById('chartsEmpty').style.display   = hasAny ? 'none'  : 'block';
-    document.getElementById('chartsContent').style.display = hasAny ? 'block' : 'none';
-    if(!hasAny) return;
-
-    const ctxBar = document.getElementById('barChart').getContext('2d');
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    const labels = []; const ds = { inc:[], exp:[], fix:[] };
-    const fixedTotal = entries.filter(e => e.type === 'fixed').reduce((a,b) => a+b.amount, 0);
-
-    // ════ תיקון 2: גרף עמודות — שימוש ב-viewDate ולא new Date() ══════
-    for(let i=5; i>=0; i--) {
-        const d = new Date(viewDate.getFullYear(), viewDate.getMonth() - i, 1);
-        labels.push(new Intl.DateTimeFormat('he-IL', {month:'short'}).format(d));
-        const mD = entries.filter(e => {
-            const ed = new Date(e.date);
-            return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
-        });
-        ds.inc.push(mD.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0));
-        ds.exp.push(mD.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0));
-        ds.fix.push(fixedTotal);
-    }
-
-    const avgInc = Math.round(ds.inc.reduce((a,b)=>a+b,0) / 6);
-    const avgExp = Math.round(ds.exp.reduce((a,b)=>a+b,0) / 6);
-
-    if(charts.bar) charts.bar.destroy();
-    charts.bar = new Chart(ctxBar, {
-        type: 'bar', data: { labels, datasets: [
-            { label: `הכנסות (₪${avgInc.toLocaleString()} ממוצע)`, data: ds.inc, backgroundColor: '#10b981' },
-            { label: `הוצאות (₪${avgExp.toLocaleString()} ממוצע)`, data: ds.exp, backgroundColor: '#f43f5e' },
-            { label: `קבועות (₪${fixedTotal.toLocaleString()})`, data: ds.fix, backgroundColor: '#8b5cf6' }
-        ]}, options: { 
-            responsive: true, 
-            plugins: { legend: { display: true, labels: { color: '#64748b', font: { size: 10 } } } }, 
-            scales: { y: { ticks: { color: '#64748b' } }, x: { ticks: { color: '#64748b' } } }
-        }
-    });
-
-    // ════ תיקון 3: גרף עוגה — הוספת getFullYear() ══════════════════
-    const cur = entries.filter(e => {
-        const ed = new Date(e.date);
-        return ed.getMonth() === viewDate.getMonth() && ed.getFullYear() === viewDate.getFullYear();
-    });
-    const curInc = cur.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0);
-    const curExp = cur.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0);
-
-    if(charts.pie) charts.pie.destroy();
-    charts.pie = new Chart(ctxPie, {
-        type: 'doughnut', data: { 
-            labels: [
-                `הכנסות: ₪${curInc.toLocaleString()}`, 
-                `הוצאות: ₪${curExp.toLocaleString()}`, 
-                `קבועות: ₪${fixedTotal.toLocaleString()}`
-            ], 
-            datasets: [{ 
-                data: [curInc, curExp, fixedTotal], 
-                backgroundColor: ['#10b981','#f43f5e','#8b5cf6'], 
-                borderWidth: 0 
-            }]
-        },
-        options: { 
-            cutout: '75%', 
-            plugins: { legend: { display: true, position: 'bottom', labels: { color: '#64748b', font: { size: 11 }, padding: 15 } } } 
-        }
-    });
-    applyPrivacyUI();
+function showToast(m, c) {
+    const t = document.getElementById('privacyToast');
+    document.getElementById('toastText').innerText = m;
+    t.style.background = c || 'rgba(255,255,255,0.1)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-function exportToCSV() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    const monthEntries = entries.filter(e => { const d = new Date(e.date); return d.getMonth() === m && d.getFullYear() === y; });
-    const fixedEntries = entries.filter(e => e.type === 'fixed');
-    const all = [...monthEntries, ...fixedEntries];
-    let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
-    // CSV protection: wrap fields with commas in quotes
-    const csvField = v => String(v||'').includes(',') ? `"${v}"` : String(v||'');
-    all.forEach(e => { csv += `${csvField(e.desc)},${e.amount},${e.type},${e.date || 'קבוע'}\n`; });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `money-${m+1}-${y}.csv`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+// התחברות
+function loginGoogle() {
+    const p = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(p);
+}
+function loginAnon() { firebase.auth().signInAnonymously(); }
+
+function updateUserUI(user) {
+    if(user.isAnonymous) return;
+    document.getElementById('userChip').style.display = 'flex';
+    document.getElementById('userName').innerText = user.displayName.split(' ')[0];
+    document.getElementById('userAvatar').src = user.photoURL;
 }
 
-function exportToJSON() {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'backup.json';
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-function triggerImportJSON() {
-    document.getElementById('importJsonFile').click();
-}
-
-// הסקריפט נמצא ב-<body> — DOM מוכן, אין צורך ב-DOMContentLoaded
-document.getElementById('importJsonFile').addEventListener('change', function(ev) {
-        const file = ev.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                if(!Array.isArray(data)) throw new Error('not array');
-                if(!db) { showToast('❌ אין חיבור ענן', 'var(--expense)'); return; }
-                // Write all items to Firebase
-                const batch = {};
-                data.forEach(item => { batch[item.id] = item; });
-                db.set(batch).then(() => {
-                    showToast(`📂 שוחזרו ${data.length} פריטים`, null);
-                }).catch(() => showToast('❌ שגיאה בשחזור', 'var(--expense)'));
-            } catch {
-                showToast('❌ קובץ JSON לא תקין', 'var(--expense)');
-            }
-        };
-        reader.readAsText(file);
-        ev.target.value = '';
-});
-
-// ════ תיקון 1: changeMonth — יצירת אובייקט Date חדש ══════════════
-// viewDate.setMonth() גורם לבאג: 31 ינואר + חודש = 3 מרץ
-function changeMonth(n) {
-    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
-    sessionStorage.setItem('mm_viewDate', viewDate.toISOString());
-    render();
-    if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
-}
-
-// ── Toast helper ──────────────────────────────────────────────
-function showToast(msg, color) {
-    const toast = document.getElementById('privacyToast');
-    const icon  = document.getElementById('toastIcon');
-    const text  = document.getElementById('toastText');
-    icon.innerText  = '';
-    text.innerText  = msg;
-    toast.style.background = color || 'rgba(14,165,233,0.15)';
-    toast.style.color      = color === 'var(--expense)' ? '#f43f5e' : '#38bdf8';
-    toast.style.borderColor= color === 'var(--expense)' ? 'rgba(244,63,94,0.3)' : 'rgba(56,189,248,0.3)';
-    toast.classList.add('show');
-    clearTimeout(toast._t);
-    toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
-}
-
-// ── Service Worker Registration ──────────────────────────
+// Service Worker
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(() => console.log('✅ SW registered'))
-            .catch(e => console.log('SW error:', e));
-    });
+    navigator.serviceWorker.register('sw.js');
 }
-
-// ESC key closes modals and sheets
-document.addEventListener('keydown', function(e) {
-    if(e.key === 'Escape') {
-        closeConfirm();
-        closeAllSheets();
-    }
-});
 
 init();
 </script>
