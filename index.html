@@ -8,8 +8,9 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="manifest.json">
-
+    <meta name="apple-mobile-web-app-title" content="Manager Money">
+    <meta name="description" content="ניהול תקציב אישי חכם">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
     
@@ -48,10 +49,11 @@
 
         .privacy-toast {
             position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-10px);
-            background: rgba(14, 165, 233, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            color: #38bdf8; padding: 8px 20px; border-radius: 25px; border: 1px solid rgba(56, 189, 248, 0.3);
-            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; z-index: 5000;
-            opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            background: rgba(14, 165, 233, 0.15); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px); color: #38bdf8; padding: 8px 20px; 
+            border-radius: 25px; border: 1px solid rgba(56, 189, 248, 0.3);
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
+            z-index: 5000; opacity: 0; pointer-events: none; transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
         }
         .privacy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -85,7 +87,7 @@
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; 
             padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
+        .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
         .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; }
 
         .bottom-nav {
@@ -112,8 +114,9 @@
         .sheet.open { bottom: 0; }
         
         input, select { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 12px; padding: 15px; color: white; margin-bottom: 12px; outline: none; }
-        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; }
-        
+        .btn-main { width: 100%; padding: 18px; border-radius: 15px; border: none; background: var(--title-grad); color: white; font-weight: 900; cursor: pointer; font-size: 1rem; }
+        .btn-cancel { width: 100%; padding: 12px; background: none; border: 1px solid var(--expense); border-radius: 15px; color: var(--expense); font-weight: 800; margin-top: 10px; cursor: pointer; }
+
         .confirm-box { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: #1e293b; padding: 25px; border-radius: 25px; border: 1px solid var(--glass-border);
@@ -123,29 +126,35 @@
         .login-screen {
             position: fixed; inset: 0; z-index: 9999;
             background: radial-gradient(circle at 50% -20%, #1e293b 0%, #050810 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; text-align: center;
         }
         .login-screen.hidden { display: none; }
-        .user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: var(--text-dim); }
+        .user-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px 12px; font-size: 0.7rem; color: var(--text-dim); cursor: pointer; }
         .user-chip img { width: 22px; height: 22px; border-radius: 50%; }
 
         .page { display: none; }
         .page.active { display: block; }
-        
-        /* Statistics Styling */
+
+        /* STATISTICS PAGE STYLING */
         .stats-section { margin-bottom: 18px; }
-        .stat-row { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .stats-section-title { font-size: 0.75rem; font-weight: 900; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-row { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 14px; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .big-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
         .big-stat { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 18px; text-align: center; }
+        .big-stat-num { font-size: 1.8rem; font-weight: 900; }
+        .big-stat-lbl { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; }
+        .savings-bar-wrap { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 16px; margin-bottom: 10px; }
+        .savings-bar-bg { background: rgba(255,255,255,0.06); border-radius: 999px; height: 12px; overflow: hidden; margin-top: 10px; }
+        .savings-bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
     </style>
 </head>
 <body>
 
 <div class="login-screen" id="loginScreen">
     <div style="font-size: 5rem; margin-bottom: 10px;">💎</div>
-    <h1 style="color:white; font-family:'Montserrat';">Manager<span style="color:#38bdf8">Money</span></h1>
-    <button class="btn-main" onclick="loginGoogle()" style="max-width:300px; background:white; color:#1a1a2e; margin-top:20px;">התחבר עם Google</button>
-    <button onclick="loginAnon()" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer;">המשך ללא חשבון 👤</button>
+    <div style="font-family: 'Montserrat'; font-size: 2rem; font-weight: 900; color: white; margin-bottom: 30px;">Manager<span style="color:#38bdf8">Money</span></div>
+    <button class="btn-main" onclick="loginGoogle()" style="background:white; color:#1a1a2e; max-width:320px;">התחבר עם Google</button>
+    <button onclick="loginAnon()" style="background:none; border:none; color:var(--text-dim); margin-top:15px; cursor:pointer;">👤 המשך ללא חשבון</button>
 </div>
 
 <div class="privacy-toast" id="privacyToast">
@@ -165,18 +174,19 @@
 </div>
 
 <div class="sheet" id="sheet">
-    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px; color:white;">פעולה</h2>
+    <h2 id="modalTitle" style="text-align:center; margin-bottom:20px;">פעולה</h2>
     <input type="text" id="fDesc" placeholder="תיאור">
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
         <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal">
         <select id="fType" onchange="toggleDateField()">
-            <option value="expense">💸 הוצאה</option>
+            <option value="expense" selected>💸 הוצאה</option>
             <option value="income">💰 הכנסה</option>
             <option value="fixed">🔄 קבועה</option>
         </select>
     </div>
     <input type="date" id="fDate">
     <button class="btn-main" onclick="validateAndAsk()">שמור</button>
+    <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
 </div>
 
 <div class="container">
@@ -187,10 +197,10 @@
         </div>
         <div class="header-tools">
             <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()">👁️</button>
-            <div id="userChip" class="user-chip" style="display:none" onclick="showLogoutConfirm()">
+            <div id="userChip" class="user-chip" onclick="showLogoutConfirm()" style="display:none">
                 <img id="userAvatar" src=""><span id="userName"></span>
             </div>
-            <div class="cloud-status">
+            <div class="cloud-status" id="cloudStatus">
                 <div id="statusDot" class="status-dot"></div>
                 <span id="statusText">Cloud Sync</span>
             </div>
@@ -206,21 +216,27 @@
     <div id="page-home" class="page active">
         <div class="main-stats">
             <div class="stat-card wide">
-                <div><label>יתרה נוכחית</label><b id="bCurrent" class="money">₪0</b></div>
+                <div style="border-left: 1px solid var(--glass-border)"><label>יתרה נוכחית</label><b id="bCurrent" class="money">₪0</b></div>
                 <div><label>לאחר קבועות</label><b id="bTotal" class="money">₪0</b></div>
             </div>
         </div>
         <div id="list-home"></div>
     </div>
 
-    <div id="page-stats" class="page"><div id="statsPageContent"></div></div>
+    <div id="page-stats" class="page">
+        <div id="statsPageContent"></div>
+    </div>
+
     <div id="page-charts" class="page">
-        <div class="chart-box" style="background:var(--glass); padding:20px; border-radius:20px; margin-bottom:20px;">
+        <div class="chart-box" style="background:var(--glass); padding:20px; border-radius:20px; margin-bottom:15px;">
             <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-box" style="background:var(--glass); padding:20px; border-radius:20px; display:flex; justify-content:center;">
+            <div style="max-width:200px; width:100%;"><canvas id="pieChart"></canvas></div>
         </div>
     </div>
 
-    <div class="footer-copyright" style="text-align:center; padding:20px; color:var(--text-dim); font-size:0.7rem;">© 2026 ALEXANDER ZAVODISKER</div>
+    <div class="footer-copyright">© 2026 ALEXANDER-ZAVODISKER</div>
 </div>
 
 <nav class="bottom-nav">
@@ -238,34 +254,21 @@ const firebaseConfig = {
     projectId: "managermoney-49d0e",
     databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
 };
-
 firebase.initializeApp(firebaseConfig);
+
 let db, entries = [], viewDate = new Date(), isPrivate = false, editId = null, isFabOpen = false, pendingAction = null, charts = {};
 
-// --- סנכרון ענן חכם ---
-async function executeConfirmed() {
-    try {
-        if(pendingAction === 'save') {
-            const id = editId || Date.now().toString();
-            const type = document.getElementById('fType').value;
-            const newData = {
-                id,
-                desc: document.getElementById('fDesc').value.trim(),
-                amount: parseFloat(document.getElementById('fAmount').value),
-                type,
-                date: type === 'fixed' ? '' : document.getElementById('fDate').value
-            };
-            await db.child(id).set(newData);
-            showToast('✅ סונכרן לענן', 'var(--income)');
-        } else if(pendingAction === 'delete') {
-            await db.child(editId).remove();
-            showToast('🗑️ נמחק מהענן', null);
-        }
-        closeConfirm();
-        if(isFabOpen) toggleFab();
-    } catch (e) {
-        showToast('❌ שגיאת חיבור', 'var(--expense)');
-    }
+function loginGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider);
+}
+
+function loginAnon() {
+    firebase.auth().signInAnonymously();
+}
+
+function showLogoutConfirm() {
+    if(confirm('להתנתק מהחשבון?')) firebase.auth().signOut();
 }
 
 function init() {
@@ -277,23 +280,24 @@ function init() {
             db.on('value', snap => {
                 entries = snap.val() ? Object.values(snap.val()) : [];
                 document.getElementById('statusDot').className = 'status-dot online';
+                document.getElementById('statusText').innerText = 'מחובר ✓';
                 render();
             });
         } else {
             document.getElementById('loginScreen').classList.remove('hidden');
+            if(db) db.off();
+            db = null;
         }
     });
 }
 
-// --- פונקציות עזר ותצוגה ---
 function render() {
     const m = viewDate.getMonth(), y = viewDate.getFullYear();
     document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', {month:'long', year:'numeric'}).format(viewDate);
 
     const monthEntries = entries.filter(e => {
-        if(e.type === 'fixed') return false;
         const d = new Date(e.date);
-        return d.getMonth() === m && d.getFullYear() === y;
+        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
     });
     const fixedEntries = entries.filter(e => e.type === 'fixed');
 
@@ -306,102 +310,130 @@ function render() {
 
     renderList('list-home', [...monthEntries, ...fixedEntries]);
     if(document.getElementById('page-stats').classList.contains('active')) renderStats();
+    if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
 
 function renderList(id, data) {
     const el = document.getElementById(id);
-    el.innerHTML = data.map(e => `
+    if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
+    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
         <div class="item">
-            <div onclick="openEdit('${e.id}')">
-                ${e.type === 'fixed' ? '<span class="fixed-tag">קבוע</span>' : ''}
-                <b>${e.desc}</b><br><small>${e.date || ''}</small>
+            <div onclick="openEdit('${e.id}')" style="flex:1;">
+                ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
+                <b>${e.desc}</b><br><small style="color:var(--text-dim)">${e.date || '—'}</small>
             </div>
-            <div>
+            <div style="display:flex; align-items:center;">
                 <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
                 <span class="trash-btn" onclick="askDeleteConfirm('${e.id}')">🗑️</span>
             </div>
         </div>
     `).join('');
+    applyPrivacyUI();
 }
 
-function changeMonth(n) {
-    viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
-    render();
+function executeConfirmed() {
+    if(pendingAction === 'save') {
+        const id = editId || Date.now().toString();
+        const type = document.getElementById('fType').value;
+        db.child(id).set({
+            id,
+            desc: document.getElementById('fDesc').value,
+            amount: parseFloat(document.getElementById('fAmount').value),
+            type,
+            date: type === 'fixed' ? '' : document.getElementById('fDate').value
+        });
+    } else if(pendingAction === 'delete') {
+        db.child(editId).remove();
+    }
+    closeConfirm();
+    if(isFabOpen) toggleFab();
 }
 
-function toggleFab() {
-    isFabOpen = !isFabOpen;
-    document.getElementById('sheet').classList.toggle('open');
-    document.getElementById('overlay').style.display = isFabOpen ? 'block' : 'none';
-    if(!isFabOpen) resetForm();
+function renderStats() {
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    const curMonthE = entries.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
+    });
+    const fixedE = entries.filter(e => e.type === 'fixed');
+    
+    const curInc = curMonthE.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+    const curExp = curMonthE.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+    const curFix = fixedE.reduce((s,e)=>s+e.amount,0);
+    const curBalance = curInc - curExp - curFix;
+    const expRate = curInc > 0 ? Math.min(100, Math.round(((curExp+curFix)/curInc)*100)) : 0;
+
+    let html = `<div style="font-weight:900;font-size:1.1rem;color:var(--accent);margin-bottom:16px">📈 סיכום חודשי</div>`;
+    html += `<div class="big-stats-grid">
+        <div class="big-stat"><div class="big-stat-num" style="color:var(--income)">₪${curInc.toLocaleString()}</div><div class="big-stat-lbl">הכנסות</div></div>
+        <div class="big-stat"><div class="big-stat-num" style="color:var(--expense)">₪${(curExp+curFix).toLocaleString()}</div><div class="big-stat-lbl">הוצאות</div></div>
+    </div>`;
+
+    const barColor = expRate > 90 ? '#f43f5e' : expRate > 70 ? '#f59e0b' : '#10b981';
+    html += `<div class="savings-bar-wrap">
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem;"><span>שימוש בתקציב</span><b>${expRate}%</b></div>
+        <div class="savings-bar-bg"><div class="savings-bar-fill" style="width:${expRate}%; background:${barColor}"></div></div>
+    </div>`;
+
+    document.getElementById('statsPageContent').innerHTML = html;
 }
 
-function resetForm() {
-    editId = null;
-    document.getElementById('fDesc').value = '';
-    document.getElementById('fAmount').value = '';
-    document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
+function updateCharts() {
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    
+    const m = viewDate.getMonth(), y = viewDate.getFullYear();
+    const cur = entries.filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
+    });
+    const fix = entries.filter(e => e.type === 'fixed').reduce((s,e)=>s+e.amount,0);
+    const inc = cur.filter(e=>e.type==='income').reduce((s,e)=>s+e.amount,0);
+    const exp = cur.filter(e=>e.type==='expense').reduce((s,e)=>s+e.amount,0);
+
+    if(charts.bar) charts.bar.destroy();
+    charts.bar = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ['הכנסות', 'הוצאות', 'קבועות'],
+            datasets: [{
+                data: [inc, exp, fix],
+                backgroundColor: ['#10b981', '#f43f5e', '#8b5cf6']
+            }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+
+    if(charts.pie) charts.pie.destroy();
+    charts.pie = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['הכנסות', 'הוצאות', 'קבועות'],
+            datasets: [{ data: [inc, exp, fix], backgroundColor: ['#10b981', '#f43f5e', '#8b5cf6'], borderWidth: 0 }]
+        },
+        options: { plugins: { legend: { display: false } }, cutout: '70%' }
+    });
 }
 
-function validateAndAsk() {
-    if(!document.getElementById('fDesc').value || !document.getElementById('fAmount').value) return;
-    pendingAction = 'save';
-    executeConfirmed();
-}
-
-function askDeleteConfirm(id) {
-    editId = id;
-    pendingAction = 'delete';
-    showConfirm("מחיקה", "האם למחוק את הפעולה?", "var(--expense)");
-}
-
-function showConfirm(t, m, c) {
-    document.getElementById('confirmTitle').innerText = t;
-    document.getElementById('confirmMsg').innerText = m;
-    document.getElementById('confirmExecBtn').style.background = c;
-    document.getElementById('confirmBox').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
-
-function closeConfirm() {
-    document.getElementById('confirmBox').style.display = 'none';
-    if(!isFabOpen) document.getElementById('overlay').style.display = 'none';
-}
-
-function showPage(p, el) {
+// UI HELPER FUNCTIONS
+function togglePrivacy() { isPrivate = !isPrivate; document.getElementById('eyeBtn').classList.toggle('active'); applyPrivacyUI(); }
+function applyPrivacyUI() { document.querySelectorAll('.money').forEach(el => isPrivate ? el.classList.add('blur') : el.classList.remove('blur')); }
+function toggleFab() { isFabOpen = !isFabOpen; document.getElementById('sheet').classList.toggle('open'); document.getElementById('overlay').style.display = isFabOpen ? 'block' : 'none'; if(!isFabOpen) resetForm(); }
+function closeAllSheets() { if(isFabOpen) toggleFab(); closeConfirm(); }
+function changeMonth(n) { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1); render(); }
+function showPage(p, el) { 
     document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
     document.getElementById('page-' + p).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
     el.classList.add('active');
-    if(p === 'stats') renderStats();
+    render();
 }
-
-function showToast(m, c) {
-    const t = document.getElementById('privacyToast');
-    document.getElementById('toastText').innerText = m;
-    t.style.background = c || 'rgba(255,255,255,0.1)';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2000);
-}
-
-// התחברות
-function loginGoogle() {
-    const p = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(p);
-}
-function loginAnon() { firebase.auth().signInAnonymously(); }
-
-function updateUserUI(user) {
-    if(user.isAnonymous) return;
-    document.getElementById('userChip').style.display = 'flex';
-    document.getElementById('userName').innerText = user.displayName.split(' ')[0];
-    document.getElementById('userAvatar').src = user.photoURL;
-}
-
-// Service Worker
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
+function validateAndAsk() { pendingAction = 'save'; executeConfirmed(); }
+function askDeleteConfirm(id) { editId = id; pendingAction = 'delete'; document.getElementById('confirmBox').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; }
+function closeConfirm() { document.getElementById('confirmBox').style.display = 'none'; document.getElementById('overlay').style.display = 'none'; }
+function resetForm() { editId = null; document.getElementById('fDesc').value = ''; document.getElementById('fAmount').value = ''; }
+function toggleDateField() { document.getElementById('fDate').style.display = document.getElementById('fType').value === 'fixed' ? 'none' : 'block'; }
+function updateUserUI(user) { if(!user.isAnonymous) { document.getElementById('userChip').style.display='flex'; document.getElementById('userName').innerText = user.displayName.split(' ')[0]; document.getElementById('userAvatar').src = user.photoURL; } }
 
 init();
 </script>
