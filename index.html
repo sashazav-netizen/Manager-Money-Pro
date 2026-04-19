@@ -470,18 +470,20 @@ function safe(s) {
 function renderList(id, data) {
     const el = document.getElementById(id); if(!el) return;
     if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
-    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
+    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => {
+        const safeType = ['income','expense','fixed'].includes(e.type) ? e.type : 'text-dim';
+        return `
         <div class="item">
             <div onclick="openEdit('${e.id}')" style="flex:1;cursor:pointer;">
                 ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
                 <b>${safe(e.desc)}</b><br><small style="color:var(--text-dim)">${e.date || '—'}</small>
             </div>
             <div style="display:flex; align-items:center;">
-                <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
+                <b class="money" style="color:var(--${safeType})">₪${e.amount.toLocaleString()}</b>
                 <span class="trash-btn" onclick="event.stopPropagation();askDeleteConfirm('${e.id}')">🗑️</span>
             </div>
         </div>
-    `).join('');
+    `; }).join('');
 }
 
 function toggleFab() {
@@ -543,6 +545,7 @@ function showConfirm(title, msg, color) {
 }
 
 function executeConfirmed() {
+    if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); closeConfirm(); return; }
     if(pendingAction === 'save') {
         const id = editId || Date.now().toString();
         const type = document.getElementById('fType').value;
@@ -651,10 +654,18 @@ document.getElementById('importJsonFile').addEventListener('change', function(ev
     const file = ev.target.files[0]; if(!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
+        if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); return; }
         try {
             const data = JSON.parse(e.target.result);
             if(!Array.isArray(data)) throw new Error();
-            const batch = {}; data.forEach(item => { if(item.id) batch[item.id] = item; });
+            const validTypes = ['income','expense','fixed'];
+            const batch = {};
+            data.forEach(item => {
+                if(item.id && item.desc && typeof item.amount === 'number' && validTypes.includes(item.type)) {
+                    batch[item.id] = item;
+                }
+            });
+            if(Object.keys(batch).length === 0) throw new Error('no valid items');
             db.update(batch).then(() => showToast(`שוחזרו`, null));
         } catch { showToast('קובץ לא תקין', 'var(--expense)'); }
     };
@@ -677,8 +688,18 @@ function showToast(msg, color) {
     if(msg.includes('רגילה')) iconEmoji = "👁️";
     document.getElementById('toastIcon').innerText = iconEmoji;
     document.getElementById('toastText').innerText = msg;
-    toast.style.background = color ? color.replace('var(--', 'rgba(').replace(')', ', 0.2)') : 'rgba(15, 23, 42, 0.9)';
-    toast.style.border = color ? `1px solid ${color}` : "1px solid rgba(255,255,255,0.1)";
+    const colorMap = {
+        'var(--income)':  'rgba(16,185,129,0.2)',
+        'var(--expense)': 'rgba(244,63,94,0.2)',
+        'var(--accent)':  'rgba(14,165,233,0.2)'
+    };
+    const borderMap = {
+        'var(--income)':  '#10b981',
+        'var(--expense)': '#f43f5e',
+        'var(--accent)':  '#0ea5e9'
+    };
+    toast.style.background = color ? (colorMap[color] || 'rgba(15,23,42,0.9)') : 'rgba(15,23,42,0.9)';
+    toast.style.border = color ? `1px solid ${borderMap[color] || color}` : "1px solid rgba(255,255,255,0.1)";
     toast.classList.add('show');
     clearTimeout(toast._t); toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
