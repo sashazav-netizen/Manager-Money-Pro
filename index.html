@@ -264,19 +264,6 @@
         <div class="stat-row-new"><label>הכנסות</label><b id="compInc" class="money">₪0</b></div>
         <div class="stat-row-new"><label>הוצאות</label><b id="compExp" class="money">₪0</b></div>
         <div class="stat-row-new"><label>שינוי ביתרה</label><b id="compDiff" class="money">₪0</b></div>
-
-        <div class="stat-section-title">ממוצע 6 חודשים אחרונים</div>
-        <div class="stat-row-new"><label>ממוצע הכנסות חודשי</label><b id="avg6Inc" class="money" style="color:var(--income)">₪0</b></div>
-        <div class="stat-row-new"><label>ממוצע הוצאות חודשי</label><b id="avg6Exp" class="money" style="color:var(--expense)">₪0</b></div>
-        <div class="stat-row-new"><label>ממוצע חיסכון חודשי</label><b id="avg6Save" class="money" style="color:var(--accent)">₪0</b></div>
-
-        <div class="stat-section-title">הוצאות גדולות החודש</div>
-        <div id="topExpList"></div>
-
-        <div class="stat-section-title">פעילות החודש</div>
-        <div class="stat-row-new"><label>מספר הכנסות</label><b id="actInc" style="color:var(--income)">0 פעולות</b></div>
-        <div class="stat-row-new"><label>מספר הוצאות</label><b id="actExp" style="color:var(--expense)">0 פעולות</b></div>
-        <div class="stat-row-new"><label>סה"כ פעולות</label><b id="actTotal" style="color:var(--text-dim)">0 פעולות</b></div>
     </div>
 
     <div id="page-income" class="page"><div id="list-income"></div></div>
@@ -411,51 +398,6 @@ function render() {
     document.getElementById('compDiff').innerText = `${diff >= 0 ? '+' : ''}₪${diff.toLocaleString()}`;
     document.getElementById('compDiff').style.color = diff >= 0 ? 'var(--income)' : 'var(--expense)';
 
-    // ממוצע 6 חודשים אחרונים
-    let sum6Inc = 0, sum6Exp = 0, months6 = 0;
-    for(let i = 1; i <= 6; i++) {
-        const d6 = new Date(y, m - i, 1);
-        const mEntries6 = entries.filter(e => {
-            if(!e.date || e.type === 'fixed') return false;
-            const ed = new Date(e.date);
-            return ed.getMonth() === d6.getMonth() && ed.getFullYear() === d6.getFullYear();
-        });
-        const mInc6 = mEntries6.filter(e => e.type === 'income').reduce((a,b) => a+b.amount, 0);
-        const mExp6 = mEntries6.filter(e => e.type === 'expense').reduce((a,b) => a+b.amount, 0);
-        if(mInc6 > 0 || mExp6 > 0) { sum6Inc += mInc6; sum6Exp += mExp6; months6++; }
-    }
-    const avg6Inc  = months6 > 0 ? Math.round(sum6Inc / months6) : 0;
-    const avg6Exp  = months6 > 0 ? Math.round(sum6Exp / months6) : 0;
-    const avg6Save = avg6Inc - avg6Exp;
-    document.getElementById('avg6Inc').innerText  = `₪${avg6Inc.toLocaleString()}`;
-    document.getElementById('avg6Exp').innerText  = `₪${avg6Exp.toLocaleString()}`;
-    document.getElementById('avg6Save').innerText = `₪${avg6Save.toLocaleString()}`;
-    document.getElementById('avg6Save').style.color = avg6Save >= 0 ? 'var(--accent)' : 'var(--expense)';
-
-    // הוצאות גדולות החודש (Top 3)
-    const expOnly = monthEntries.filter(e => e.type === 'expense').sort((a,b) => b.amount - a.amount).slice(0,3);
-    const topEl = document.getElementById('topExpList');
-    if(expOnly.length === 0) {
-        topEl.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:10px 0;font-size:0.85rem">אין הוצאות החודש</p>';
-    } else {
-        topEl.innerHTML = expOnly.map((e, i) => {
-            const perc = exp > 0 ? Math.round((e.amount / exp) * 100) : 0;
-            return `<div class="stat-row-new" style="flex-direction:column;align-items:flex-end;gap:4px;">
-                <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
-                    <b class="money" style="color:var(--expense)">₪${e.amount.toLocaleString()} <span style="color:var(--text-dim);font-size:0.75rem;font-weight:400">(${perc}%)</span></b>
-                    <label style="font-weight:700">${i+1}. ${safe(e.desc)}</label>
-                </div>
-            </div>`;
-        }).join('');
-    }
-
-    // פעילות החודש
-    const cntInc = monthEntries.filter(e => e.type === 'income').length;
-    const cntExp = monthEntries.filter(e => e.type === 'expense').length;
-    document.getElementById('actInc').innerText   = `${cntInc} פעולות`;
-    document.getElementById('actExp').innerText   = `${cntExp} פעולות`;
-    document.getElementById('actTotal').innerText = `${cntInc + cntExp} פעולות`;
-
     renderList('list-home', [...monthEntries, ...fixedEntries]);
     renderList('list-income', monthEntries.filter(e => e.type === 'income'));
     renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
@@ -470,20 +412,18 @@ function safe(s) {
 function renderList(id, data) {
     const el = document.getElementById(id); if(!el) return;
     if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
-    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => {
-        const safeType = ['income','expense','fixed'].includes(e.type) ? e.type : 'text-dim';
-        return `
+    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => `
         <div class="item">
             <div onclick="openEdit('${e.id}')" style="flex:1;cursor:pointer;">
                 ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
                 <b>${safe(e.desc)}</b><br><small style="color:var(--text-dim)">${e.date || '—'}</small>
             </div>
             <div style="display:flex; align-items:center;">
-                <b class="money" style="color:var(--${safeType})">₪${e.amount.toLocaleString()}</b>
+                <b class="money" style="color:var(--${e.type})">₪${e.amount.toLocaleString()}</b>
                 <span class="trash-btn" onclick="event.stopPropagation();askDeleteConfirm('${e.id}')">🗑️</span>
             </div>
         </div>
-    `; }).join('');
+    `).join('');
 }
 
 function toggleFab() {
@@ -545,7 +485,6 @@ function showConfirm(title, msg, color) {
 }
 
 function executeConfirmed() {
-    if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); closeConfirm(); return; }
     if(pendingAction === 'save') {
         const id = editId || Date.now().toString();
         const type = document.getElementById('fType').value;
@@ -654,18 +593,10 @@ document.getElementById('importJsonFile').addEventListener('change', function(ev
     const file = ev.target.files[0]; if(!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
-        if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); return; }
         try {
             const data = JSON.parse(e.target.result);
             if(!Array.isArray(data)) throw new Error();
-            const validTypes = ['income','expense','fixed'];
-            const batch = {};
-            data.forEach(item => {
-                if(item.id && item.desc && typeof item.amount === 'number' && validTypes.includes(item.type)) {
-                    batch[item.id] = item;
-                }
-            });
-            if(Object.keys(batch).length === 0) throw new Error('no valid items');
+            const batch = {}; data.forEach(item => { if(item.id) batch[item.id] = item; });
             db.update(batch).then(() => showToast(`שוחזרו`, null));
         } catch { showToast('קובץ לא תקין', 'var(--expense)'); }
     };
@@ -688,18 +619,8 @@ function showToast(msg, color) {
     if(msg.includes('רגילה')) iconEmoji = "👁️";
     document.getElementById('toastIcon').innerText = iconEmoji;
     document.getElementById('toastText').innerText = msg;
-    const colorMap = {
-        'var(--income)':  'rgba(16,185,129,0.2)',
-        'var(--expense)': 'rgba(244,63,94,0.2)',
-        'var(--accent)':  'rgba(14,165,233,0.2)'
-    };
-    const borderMap = {
-        'var(--income)':  '#10b981',
-        'var(--expense)': '#f43f5e',
-        'var(--accent)':  '#0ea5e9'
-    };
-    toast.style.background = color ? (colorMap[color] || 'rgba(15,23,42,0.9)') : 'rgba(15,23,42,0.9)';
-    toast.style.border = color ? `1px solid ${borderMap[color] || color}` : "1px solid rgba(255,255,255,0.1)";
+    toast.style.background = color ? color.replace('var(--', 'rgba(').replace(')', ', 0.2)') : 'rgba(15, 23, 42, 0.9)';
+    toast.style.border = color ? `1px solid ${color}` : "1px solid rgba(255,255,255,0.1)";
     toast.classList.add('show');
     clearTimeout(toast._t); toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
 }
