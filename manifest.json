@@ -1,18 +1,19 @@
 {
   "name": "Manager Money Pro",
-  "short_name": "MM Pro",
-  "start_url": ".",
+  "short_name": "ManagerMoney",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#050810",
   "theme_color": "#050810",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135706.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135706.png",
       "sizes": "512x512",
       "type": "image/png"
     }
