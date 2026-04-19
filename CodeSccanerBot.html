@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Scanner Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060a12;
+    --panel: #0d1421;
+    --border: rgba(0,200,255,0.12);
+    --cyan: #00c8ff;
+    --green: #00ff9d;
+    --red: #ff4466;
+    --yellow: #ffcc00;
+    --dim: #4a5568;
+    --text: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+    background-image: 
+      radial-gradient(ellipse at 10% 0%, rgba(0,200,255,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 90% 100%, rgba(0,255,157,0.04) 0%, transparent 60%);
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 6px;
+    background: linear-gradient(90deg, var(--cyan), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--dim);
+    margin-bottom: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background: none;
+    color: var(--dim);
+    font-family: 'Heebo', sans-serif;
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+  }
+  .tab.active {
+    background: rgba(0,200,255,0.12);
+    color: var(--cyan);
+    border: 1px solid rgba(0,200,255,0.2);
+  }
+
+  /* Input area */
+  .input-area {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .input-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--dim);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    resize: vertical;
+    outline: none;
+    line-height: 1.6;
+    direction: ltr;
+    text-align: left;
+  }
+  textarea:focus { border-color: rgba(0,200,255,0.3); }
+  textarea::placeholder { color: var(--dim); }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .option-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+  .option-chip input[type="checkbox"] { display: none; }
+  .option-chip.selected {
+    border-color: rgba(0,200,255,0.35);
+    background: rgba(0,200,255,0.07);
+    color: var(--cyan);
+  }
+  .chip-icon { font-size: 1rem; }
+
+  /* Scan button */
+  .scan-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, #0070a8, #00c8ff);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+  .scan-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Loader */
+  .loader {
+    display: none;
+    text-align: center;
+    padding: 30px;
+  }
+  .loader.show { display: block; }
+  .scan-anim {
+    font-size: 2.5rem;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loader-text { color: var(--cyan); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; }
+  .dots::after {
+    content: '';
+    animation: dots 1.5s steps(3, end) infinite;
+  }
+  @keyframes dots {
+    0%   { content: ''; }
+    33%  { content: '.'; }
+    66%  { content: '..'; }
+    100% { content: '...'; }
+  }
+
+  /* Results */
+  #results { display: none; }
+  #results.show { display: block; }
+
+  .results-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .results-title {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--cyan);
+  }
+  .score-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 5px 14px;
+    border-radius: 20px;
+  }
+  .score-good  { background: rgba(0,255,157,0.12); color: var(--green); border: 1px solid rgba(0,255,157,0.25); }
+  .score-ok    { background: rgba(255,204,0,0.12);  color: var(--yellow); border: 1px solid rgba(255,204,0,0.25); }
+  .score-bad   { background: rgba(255,68,102,0.12); color: var(--red); border: 1px solid rgba(255,68,102,0.25); }
+
+  .issue-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border-right: 3px solid transparent;
+  }
+  .issue-card.critical { border-right-color: var(--red); }
+  .issue-card.warning  { border-right-color: var(--yellow); }
+  .issue-card.info     { border-right-color: var(--cyan); }
+  .issue-card.ok       { border-right-color: var(--green); }
+
+  .issue-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .issue-title { font-weight: 800; font-size: 0.9rem; }
+  .issue-badge {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+  .badge-critical { background: rgba(255,68,102,0.2); color: var(--red); }
+  .badge-warning  { background: rgba(255,204,0,0.2);  color: var(--yellow); }
+  .badge-info     { background: rgba(0,200,255,0.2);  color: var(--cyan); }
+  .badge-ok       { background: rgba(0,255,157,0.2);  color: var(--green); }
+
+  .issue-desc { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
+  .issue-fix {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    direction: rtl;
+    line-height: 1.5;
+  }
+  .issue-fix::before { content: '💡 '; }
+
+  .summary-box {
+    background: rgba(0,200,255,0.05);
+    border: 1px solid rgba(0,200,255,0.15);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: #cbd5e1;
+  }
+
+  .reset-btn {
+    width: 100%;
+    padding: 12px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--dim);
+    font-family: 'Heebo', sans-serif;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.85rem;
+    transition: 0.2s;
+  }
+  .reset-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  .error-box {
+    background: rgba(255,68,102,0.08);
+    border: 1px solid rgba(255,68,102,0.2);
+    border-radius: 12px;
+    padding: 16px;
+    color: var(--red);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🔍 Code Scanner Bot</h1>
+<p class="subtitle">סורק תקלות בקוד · מבוסס Claude AI</p>
+
+<div class="tabs">
+  <button class="tab active" onclick="setTab('paste', this)">📋 הדבק קוד</button>
+  <button class="tab" onclick="setTab('upload', this)">📁 העלה קובץ</button>
+</div>
+
+<div class="input-area">
+  <div class="input-label">הכנס קוד לסריקה</div>
+  <div id="pasteArea">
+    <textarea id="codeInput" placeholder="הדבק כאן את הקוד שלך (HTML, JS, CSS)..."></textarea>
+  </div>
+  <div id="uploadArea" style="display:none;">
+    <input type="file" id="fileInput" accept=".html,.js,.css,.json" style="display:none" onchange="loadFile(this)">
+    <div onclick="document.getElementById('fileInput').click()" style="
+      border: 2px dashed rgba(0,200,255,0.2); border-radius: 10px; padding: 30px;
+      text-align: center; cursor: pointer; color: var(--dim); font-weight: 700; font-size: 0.85rem;
+      transition: 0.2s;" onmouseover="this.style.borderColor='rgba(0,200,255,0.4)'" onmouseout="this.style.borderColor='rgba(0,200,255,0.2)'">
+      <div style="font-size:2rem;margin-bottom:8px">📂</div>
+      לחץ לבחירת קובץ<br><span style="font-size:0.7rem;font-weight:400">HTML · JS · CSS · JSON</span>
+    </div>
+    <div id="fileName" style="text-align:center;margin-top:8px;color:var(--cyan);font-size:0.8rem;font-weight:700"></div>
+  </div>
+</div>
+
+<div class="options-grid">
+  <div class="option-chip selected" onclick="toggleChip(this,'security')">
+    <span class="chip-icon">🔐</span> אבטחה
+    <input type="checkbox" checked>
+  </div>
+  <div class="option-chip selected" onclick="toggleChip(this,'performance')">
+    <span class="chip-icon">⚡</span> ביצועים
+    <input type="checkbox" checked>
+  </div>
+  <div class="option-chip selected" onclick="toggleChip(this,'bugs')">
+    <span class="chip-icon">🐛</span> באגים
+    <input type="checkbox" checked>
+  </div>
+  <div class="option-chip selected" onclick="toggleChip(this,'best_practices')">
+    <span class="chip-icon">✅</span> Best Practices
+    <input type="checkbox" checked>
+  </div>
+</div>
+
+<button class="scan-btn" id="scanBtn" onclick="startScan()">🔍 סרוק קוד</button>
+
+<div class="loader" id="loader">
+  <div class="scan-anim">🔍</div>
+  <div class="loader-text">סורק קוד<span class="dots"></span></div>
+</div>
+
+<div id="errorBox" class="error-box" style="display:none"></div>
+
+<div id="results">
+  <div class="results-header">
+    <div class="results-title">תוצאות סריקה</div>
+    <div id="scoreBadge" class="score-badge"></div>
+  </div>
+  <div class="summary-box" id="summaryBox"></div>
+  <div id="issuesList"></div>
+  <button class="reset-btn" onclick="resetAll()">🔄 סריקה חדשה</button>
+</div>
+
+<script>
+let currentTab = 'paste';
+let selectedOptions = new Set(['security','performance','bugs','best_practices']);
+
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pasteArea').style.display  = tab === 'paste'  ? 'block' : 'none';
+  document.getElementById('uploadArea').style.display = tab === 'upload' ? 'block' : 'none';
+}
+
+function toggleChip(el, key) {
+  el.classList.toggle('selected');
+  if(selectedOptions.has(key)) selectedOptions.delete(key);
+  else selectedOptions.add(key);
+}
+
+function loadFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  document.getElementById('fileName').innerText = '📄 ' + file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('codeInput').value = e.target.result;
+    setTab('paste', document.querySelectorAll('.tab')[0]);
+  };
+  reader.readAsText(file);
+}
+
+async function startScan() {
+  const code = document.getElementById('codeInput').value.trim();
+  if(!code) { showError('⚠️ אנא הכנס קוד לסריקה'); return; }
+  if(selectedOptions.size === 0) { showError('⚠️ בחר לפחות סוג סריקה אחד'); return; }
+
+  document.getElementById('scanBtn').disabled = true;
+  document.getElementById('loader').classList.add('show');
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('errorBox').style.display = 'none';
+
+  const categories = {
+    security: 'אבטחה (XSS, injection, חשיפת מפתחות, eval)',
+    performance: 'ביצועים (memory leaks, loops, DOM inefficiency)',
+    bugs: 'באגים לוגיים (undefined vars, async errors, edge cases)',
+    best_practices: 'Best Practices (קוד נקי, DRY, error handling)'
+  };
+
+  const scanFor = [...selectedOptions].map(k => categories[k]).join(', ');
+  const codeSnippet = code.length > 8000 ? code.slice(0, 8000) + '\n\n[...קוד קוצר לצורך ניתוח]' : code;
+
+  const prompt = `אתה מומחה code review. סרוק את הקוד הבא וחפש בעיות ב: ${scanFor}.
+
+החזר תשובה ב-JSON בלבד (ללא backticks), במבנה הזה:
+{
+  "score": <מספר 0-100>,
+  "summary": "<סיכום קצר בעברית של מצב הקוד>",
+  "issues": [
+    {
+      "title": "<שם הבעיה בעברית>",
+      "severity": "<critical|warning|info|ok>",
+      "description": "<תיאור הבעיה בעברית>",
+      "fix": "<הצעה לתיקון בעברית>"
+    }
+  ]
+}
+
+severity:
+- critical = תקלה חמורה שחייבת תיקון
+- warning = בעיה שכדאי לתקן
+- info = הצעה לשיפור
+- ok = נקודה חיובית בקוד
+
+הקוד:
+\`\`\`
+${codeSnippet}
+\`\`\``;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    showResults(parsed);
+  } catch(err) {
+    showError('שגיאה בסריקה. נסה שוב.');
+  } finally {
+    document.getElementById('scanBtn').disabled = false;
+    document.getElementById('loader').classList.remove('show');
+  }
+}
+
+function showResults(data) {
+  // Score badge
+  const badge = document.getElementById('scoreBadge');
+  badge.innerText = `ציון: ${data.score}/100`;
+  badge.className = 'score-badge ' + (data.score >= 75 ? 'score-good' : data.score >= 50 ? 'score-ok' : 'score-bad');
+
+  // Summary
+  document.getElementById('summaryBox').innerText = data.summary;
+
+  // Issues
+  const list = document.getElementById('issuesList');
+  list.innerHTML = (data.issues || []).map(issue => `
+    <div class="issue-card ${issue.severity}">
+      <div class="issue-top">
+        <div class="issue-title">${escHtml(issue.title)}</div>
+        <span class="issue-badge badge-${issue.severity}">${severityLabel(issue.severity)}</span>
+      </div>
+      <div class="issue-desc">${escHtml(issue.description)}</div>
+      ${issue.fix ? `<div class="issue-fix">${escHtml(issue.fix)}</div>` : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').classList.add('show');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function severityLabel(s) {
+  return { critical:'🔴 קריטי', warning:'🟡 אזהרה', info:'🔵 הצעה', ok:'🟢 טוב' }[s] || s;
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  box.innerText = msg;
+  box.style.display = 'block';
+}
+
+function resetAll() {
+  document.getElementById('codeInput').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results').classList.remove('show');
+  document.getElementById('errorBox').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
