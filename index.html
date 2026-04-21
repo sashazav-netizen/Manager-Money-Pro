@@ -113,8 +113,10 @@
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; 
             padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
+        
         .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 6px; border-radius: 6px; font-size: 0.6rem; margin-right: 5px; font-weight: 900; }
-        .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; }
+        .trash-btn { color: var(--expense); font-size: 1.1rem; cursor: pointer; opacity: 0.6; margin-right: 12px; transition: opacity 0.2s; }
+        .trash-btn:hover { opacity: 1; }
 
         .footer-copyright {
             text-align: center; font-size: 0.7rem; color: var(--text-dim);
@@ -162,6 +164,7 @@
         .chart-box { background: var(--glass); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-bottom: 15px; display: flex; flex-direction: column; align-items: center; width: 100%; }
         .pie-container { max-width: 140px; width: 100%; margin: 0 auto; }
         .settings-btn { width: 100%; padding: 15px; border-radius: 12px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+
     </style>
 </head>
 <body>
@@ -184,9 +187,9 @@
 
 <div class="sheet" id="sheet">
     <h2 id="modalTitle" style="text-align:center; margin-bottom:20px;">פעולה</h2>
-    <input type="text" id="fDesc" placeholder="תיאור">
+    <input type="text" id="fDesc" placeholder="תיאור" maxlength="100">
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-        <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal">
+        <input type="number" id="fAmount" placeholder="סכום" inputmode="decimal" step="0.01" min="0.01">
         <select id="fType" onchange="toggleDateField()">
             <option value="expense" selected>💸 הוצאה</option>
             <option value="income">💰 הכנסה</option>
@@ -321,17 +324,145 @@ firebase.initializeApp(firebaseConfig);
 const _saved = sessionStorage.getItem('mm_viewDate');
 let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date(), isPrivate = false, editId = null, isFabOpen = false, isSettingsOpen = false, pendingAction = null, charts = {};
 
+// מטמון לחישובים
+let cache = {
+    monthlyFixed: new Map(),
+    lastCacheClear: Date.now()
+};
+
+function clearCacheIfNeeded() {
+    if (Date.now() - cache.lastCacheClear > 60000) {
+        cache.monthlyFixed.clear();
+        cache.lastCacheClear = Date.now();
+    }
+}
+
+function getMonthlyFixed(year, month) {
+    clearCacheIfNeeded();
+    const cacheKey = `${year}-${month}`;
+    
+    if (cache.monthlyFixed.has(cacheKey)) {
+        return cache.monthlyFixed.get(cacheKey);
+    }
+    
+    let total = 0;
+    entries.forEach(e => {
+        if (e.type === 'fixed') {
+            if (!e.date) {
+                total += e.amount;
+            } else {
+                const d = new Date(e.date);
+                if (!isNaN(d.getTime()) && d.getMonth() === month && d.getFullYear() === year) {
+                    total += e.amount;
+                }
+            }
+        }
+    });
+    
+    cache.monthlyFixed.set(cacheKey, total);
+    return total;
+}
+
+function validateAmount(amount) {
+    const maxAmount = 999999999;
+    if (isNaN(amount) || amount <= 0) {
+        showToast('סכום חייב להיות מספר חיובי', 'var(--expense)');
+        return false;
+    }
+    if (amount > maxAmount) {
+        showToast(`סכום לא יכול לעלות על ${maxAmount.toLocaleString()} ₪`, 'var(--expense)');
+        return false;
+    }
+    return true;
+}
+
+function validateDescription(desc) {
+    const maxLength = 100;
+    if (!desc || desc.trim() === '') {
+        showToast('נא להזין תיאור', 'var(--expense)');
+        return false;
+    }
+    if (desc.length > maxLength) {
+        showToast(`תיאור לא יכול לעלות על ${maxLength} תווים`, 'var(--expense)');
+        return false;
+    }
+    return true;
+}
+
+function validateDate(dateStr, type) {
+    if (type === 'fixed') return true;
+    if (!dateStr) {
+        showToast('נא לבחור תאריך', 'var(--expense)');
+        return false;
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+        showToast('תאריך לא תקין', 'var(--expense)');
+        return false;
+    }
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() + 10, today.getMonth(), today.getDate());
+    if (date > maxDate) {
+        showToast('תאריך לא יכול להיות רחוק יותר מ-10 שנים קדימה', 'var(--expense)');
+        return false;
+    }
+    return true;
+}
+
+function handleError(error, context) {
+    console.error(`[${context}] Error:`, error);
+    
+    let userMessage = 'אירעה שגיאה';
+    let errorColor = 'var(--expense)';
+    
+    if (error.code) {
+        switch(error.code) {
+            case 'PERMISSION_DENIED':
+                userMessage = 'אין הרשאה לביצוע פעולה זו';
+                break;
+            case 'NETWORK_ERROR':
+                userMessage = 'בעיית רשת, בדוק חיבור לאינטרנט';
+                break;
+            case 'QUOTA_EXCEEDED':
+                userMessage = 'חריגה ממכסת הנתונים';
+                break;
+            default:
+                userMessage = `שגיאה: ${error.message || 'שגיאה לא ידועה'}`;
+        }
+    }
+    
+    showToast(userMessage, errorColor);
+    
+    const errorLog = JSON.parse(localStorage.getItem('error_log') || '[]');
+    errorLog.push({
+        timestamp: new Date().toISOString(),
+        context: context,
+        message: error.message || error,
+        code: error.code || null
+    });
+    while (errorLog.length > 50) errorLog.shift();
+    localStorage.setItem('error_log', JSON.stringify(errorLog));
+}
+
 function init() {
     firebase.auth().signInAnonymously().then(user => {
         db = firebase.database().ref(`users/${user.user.uid}/data`);
         document.getElementById('statusDot').className = 'status-dot online';
         document.getElementById('statusText').innerText = 'מחובר ✓';
         db.on('value', snap => {
-            entries = snap.val() ? Object.values(snap.val()) : [];
-            render();
-            if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+            try {
+                entries = snap.val() ? Object.values(snap.val()) : [];
+                render();
+                if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
+                cache.monthlyFixed.clear();
+            } catch (err) {
+                handleError(err, 'db.onValue');
+            }
+        }, error => {
+            handleError(error, 'db.subscription');
         });
-    }).catch(() => {
+    }).catch(error => {
+        handleError(error, 'firebase.auth');
         document.getElementById('statusText').innerText = 'לא מקוון';
         document.getElementById('statusDot').style.background = 'var(--text-dim)';
         render();
@@ -341,10 +472,24 @@ function init() {
 function validateAndAsk() {
     const desc = document.getElementById('fDesc');
     const amount = document.getElementById('fAmount');
+    const type = document.getElementById('fType').value;
+    const date = document.getElementById('fDate').value;
+    
     let valid = true;
     [desc, amount].forEach(el => el.classList.remove('error'));
-    if (!desc.value.trim()) { desc.classList.add('error'); valid = false; }
-    if (!amount.value || parseFloat(amount.value) <= 0) { amount.classList.add('error'); valid = false; }
+    
+    if (!validateDescription(desc.value)) {
+        desc.classList.add('error');
+        valid = false;
+    }
+    if (!validateAmount(parseFloat(amount.value))) {
+        amount.classList.add('error');
+        valid = false;
+    }
+    if (!validateDate(date, type)) {
+        valid = false;
+    }
+    
     if (!valid) return;
     askSaveConfirm();
 }
@@ -372,21 +517,21 @@ function render() {
         const d = new Date(e.date);
         return d.getMonth() === m && d.getFullYear() === y && e.type !== 'fixed';
     });
-    const fixedEntries = entries.filter(e => e.type === 'fixed');
+    
+    const monthlyFixed = getMonthlyFixed(y, m);
 
-    let inc = 0, exp = 0, fix = 0;
+    let inc = 0, exp = 0;
     monthEntries.forEach(e => {
         if(e.type === 'income') inc += e.amount;
         else if(e.type === 'expense') exp += e.amount;
     });
-    fixedEntries.forEach(e => fix += e.amount);
 
     document.getElementById('bInc').innerText = `₪${inc.toLocaleString()}`;
     document.getElementById('bExp').innerText = `₪${exp.toLocaleString()}`;
     document.getElementById('bCurrent').innerText = `₪${(inc - exp).toLocaleString()}`;
-    document.getElementById('bTotal').innerText = `₪${(inc - exp - fix).toLocaleString()}`;
+    document.getElementById('bTotal').innerText = `₪${(inc - exp - monthlyFixed).toLocaleString()}`;
 
-    const totalExp = exp + fix;
+    const totalExp = exp + monthlyFixed;
     const balance = inc - totalExp;
     document.getElementById('sInc').innerText = `₪${inc.toLocaleString()}`;
     document.getElementById('sExp').innerText = `₪${totalExp.toLocaleString()}`;
@@ -397,12 +542,14 @@ function render() {
     document.getElementById('sBar').style.width = `${100 - savePerc}%`;
 
     const prevMonth = new Date(y, m - 1, 1);
-    const prevEntries = entries.filter(e => {
+    const prevMonthEntries = entries.filter(e => {
         const d = new Date(e.date);
-        return d.getMonth() === prevMonth.getMonth() && d.getFullYear() === prevMonth.getFullYear();
+        return d.getMonth() === prevMonth.getMonth() && d.getFullYear() === prevMonth.getFullYear() && e.type !== 'fixed';
     });
-    const pInc = prevEntries.filter(e => e.type === 'income').reduce((a, b) => a + b.amount, 0);
-    const pExp = prevEntries.filter(e => e.type === 'expense').reduce((a, b) => a + b.amount, 0) + fix;
+    const prevMonthlyFixed = getMonthlyFixed(prevMonth.getFullYear(), prevMonth.getMonth());
+    
+    const pInc = prevMonthEntries.filter(e => e.type === 'income').reduce((a, b) => a + b.amount, 0);
+    const pExp = prevMonthEntries.filter(e => e.type === 'expense').reduce((a, b) => a + b.amount, 0) + prevMonthlyFixed;
     const pBal = pInc - pExp;
 
     document.getElementById('compInc').innerText = `₪${pInc.toLocaleString()}`;
@@ -411,7 +558,6 @@ function render() {
     document.getElementById('compDiff').innerText = `${diff >= 0 ? '+' : ''}₪${diff.toLocaleString()}`;
     document.getElementById('compDiff').style.color = diff >= 0 ? 'var(--income)' : 'var(--expense)';
 
-    // ממוצע 6 חודשים אחרונים
     let sum6Inc = 0, sum6Exp = 0, months6 = 0;
     for(let i = 1; i <= 6; i++) {
         const d6 = new Date(y, m - i, 1);
@@ -420,8 +566,9 @@ function render() {
             const ed = new Date(e.date);
             return ed.getMonth() === d6.getMonth() && ed.getFullYear() === d6.getFullYear();
         });
+        const fixed6 = getMonthlyFixed(d6.getFullYear(), d6.getMonth());
         const mInc6 = mEntries6.filter(e => e.type === 'income').reduce((a,b) => a+b.amount, 0);
-        const mExp6 = mEntries6.filter(e => e.type === 'expense').reduce((a,b) => a+b.amount, 0);
+        const mExp6 = mEntries6.filter(e => e.type === 'expense').reduce((a,b) => a+b.amount, 0) + fixed6;
         if(mInc6 > 0 || mExp6 > 0) { sum6Inc += mInc6; sum6Exp += mExp6; months6++; }
     }
     const avg6Inc  = months6 > 0 ? Math.round(sum6Inc / months6) : 0;
@@ -432,7 +579,6 @@ function render() {
     document.getElementById('avg6Save').innerText = `₪${avg6Save.toLocaleString()}`;
     document.getElementById('avg6Save').style.color = avg6Save >= 0 ? 'var(--accent)' : 'var(--expense)';
 
-    // הוצאות גדולות החודש (Top 3)
     const expOnly = monthEntries.filter(e => e.type === 'expense').sort((a,b) => b.amount - a.amount).slice(0,3);
     const topEl = document.getElementById('topExpList');
     if(expOnly.length === 0) {
@@ -449,13 +595,14 @@ function render() {
         }).join('');
     }
 
-    // פעילות החודש
     const cntInc = monthEntries.filter(e => e.type === 'income').length;
     const cntExp = monthEntries.filter(e => e.type === 'expense').length;
     document.getElementById('actInc').innerText   = `${cntInc} פעולות`;
     document.getElementById('actExp').innerText   = `${cntExp} פעולות`;
     document.getElementById('actTotal').innerText = `${cntInc + cntExp} פעולות`;
 
+    const fixedEntries = entries.filter(e => e.type === 'fixed');
+    
     renderList('list-home', [...monthEntries, ...fixedEntries]);
     renderList('list-income', monthEntries.filter(e => e.type === 'income'));
     renderList('list-expense', monthEntries.filter(e => e.type === 'expense'));
@@ -523,7 +670,13 @@ function openEdit(id) {
     document.getElementById('fDesc').value = e.desc;
     document.getElementById('fAmount').value = e.amount;
     document.getElementById('fType').value = e.type;
-    document.getElementById('fDate').value = e.date || new Date().toISOString().split('T')[0];
+    
+    if (e.type === 'fixed' && !e.date) {
+        document.getElementById('fDate').value = '';
+    } else {
+        document.getElementById('fDate').value = e.date || new Date().toISOString().split('T')[0];
+    }
+    
     toggleDateField();
     document.getElementById('modalTitle').innerText = 'עריכת פעולה';
     toggleFab();
@@ -547,19 +700,33 @@ function showConfirm(title, msg, color) {
 function executeConfirmed() {
     if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); closeConfirm(); return; }
     if(pendingAction === 'save') {
+        const amount = parseFloat(document.getElementById('fAmount').value);
+        if (!validateAmount(amount)) {
+            closeConfirm();
+            return;
+        }
+        
         const id = editId || Date.now().toString();
         const type = document.getElementById('fType').value;
         const date = type === 'fixed' ? '' : (document.getElementById('fDate').value || new Date().toISOString().split('T')[0]);
+        
         db.child(id).set({
-            id, desc: document.getElementById('fDesc').value,
-            amount: Math.round(parseFloat(document.getElementById('fAmount').value) * 100) / 100,
-            type, date
-        }).then(() => showToast('נשמר', 'var(--income)'))
-          .catch(() => showToast('שגיאה בשמירה', 'var(--expense)'));
+            id, 
+            desc: document.getElementById('fDesc').value,
+            amount: Math.round(amount * 100) / 100,
+            type, 
+            date
+        }).then(() => {
+            showToast('נשמר', 'var(--income)');
+            cache.monthlyFixed.clear();
+        }).catch((error) => handleError(error, 'save'));
     } else if(pendingAction === 'delete') {
         db.child(editId).remove()
-          .then(() => showToast('נמחק', null))
-          .catch(() => showToast('שגיאה במחיקה', 'var(--expense)'));
+          .then(() => {
+              showToast('נמחק', null);
+              cache.monthlyFixed.clear();
+          })
+          .catch((error) => handleError(error, 'delete'));
         editId = null;
     }
     closeConfirm(); if(isFabOpen) toggleFab();
@@ -574,7 +741,8 @@ function closeConfirm() {
 function showPage(p, el) {
     document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(nv => nv.classList.remove('active'));
-    document.getElementById('page-' + p).classList.add('active'); el.classList.add('active');
+    document.getElementById('page-' + p).classList.add('active'); 
+    if (el) el.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if(p === 'charts') updateCharts();
 }
@@ -588,7 +756,6 @@ function updateCharts() {
     const ctxBar = document.getElementById('barChart').getContext('2d');
     const ctxPie = document.getElementById('pieChart').getContext('2d');
     const labels = []; const ds = { inc:[], exp:[], fix:[] };
-    const fixedTotal = entries.filter(e => e.type === 'fixed').reduce((a,b) => a+b.amount, 0);
 
     for(let i=5; i>=0; i--) {
         const d = new Date(viewDate.getFullYear(), viewDate.getMonth() - i, 1);
@@ -598,20 +765,23 @@ function updateCharts() {
             const ed = new Date(e.date);
             return ed.getMonth() === d.getMonth() && ed.getFullYear() === d.getFullYear();
         });
+        const monthlyFixed = getMonthlyFixed(d.getFullYear(), d.getMonth());
+        
         ds.inc.push(mD.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0));
         ds.exp.push(mD.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0));
-        ds.fix.push(fixedTotal);
+        ds.fix.push(monthlyFixed);
     }
 
     const curInc = ds.inc[ds.inc.length-1];
     const curExp = ds.exp[ds.exp.length-1];
+    const curFix = ds.fix[ds.fix.length-1];
 
     if(charts.bar) charts.bar.destroy();
     charts.bar = new Chart(ctxBar, {
         type: 'bar', data: { labels, datasets: [
             { label: `הכנסות: ₪${curInc.toLocaleString()}`, data: ds.inc, backgroundColor: '#10b981' },
             { label: `הוצאות: ₪${curExp.toLocaleString()}`, data: ds.exp, backgroundColor: '#f43f5e' },
-            { label: `קבועות: ₪${fixedTotal.toLocaleString()}`, data: ds.fix, backgroundColor: '#8b5cf6' }
+            { label: `קבועות: ₪${curFix.toLocaleString()}`, data: ds.fix, backgroundColor: '#8b5cf6' }
         ]}, 
         options: { 
             responsive: true, 
@@ -623,9 +793,9 @@ function updateCharts() {
     charts.pie = new Chart(ctxPie, {
         type: 'doughnut', 
         data: { 
-            labels: [`₪${curInc.toLocaleString()}`, `₪${curExp.toLocaleString()}`, `₪${fixedTotal.toLocaleString()}`], 
+            labels: [`₪${curInc.toLocaleString()}`, `₪${curExp.toLocaleString()}`, `₪${curFix.toLocaleString()}`], 
             datasets: [{ 
-                data: [curInc, curExp, fixedTotal], 
+                data: [curInc, curExp, curFix], 
                 backgroundColor: ['#10b981','#f43f5e','#8b5cf6'], 
                 borderWidth: 0, radius: '80%'
             }]
@@ -638,17 +808,36 @@ function updateCharts() {
 }
 
 function exportToCSV() {
-    const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    const all = entries.filter(e => e.type === 'fixed' || (new Date(e.date).getMonth() === m && new Date(e.date).getFullYear() === y));
-    let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
-    all.forEach(e => { csv += `${e.desc},${e.amount},${e.type},${e.date || 'קבוע'}\n`; });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `money-${m+1}-${y}.csv`; a.click();
+    try {
+        const m = viewDate.getMonth(), y = viewDate.getFullYear();
+        const monthEntries = entries.filter(e => {
+            if (!e.date || e.type === 'fixed') return false;
+            const d = new Date(e.date);
+            return d.getMonth() === m && d.getFullYear() === y;
+        });
+        
+        let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
+        monthEntries.forEach(e => { csv += `${e.desc},${e.amount},${e.type === 'income' ? 'הכנסה' : 'הוצאה'},${e.date}\n`; });
+        
+        const fixedEntries = entries.filter(e => e.type === 'fixed');
+        fixedEntries.forEach(e => { csv += `${e.desc},${e.amount},הוצאה קבועה,${e.date || 'כל חודש'}\n`; });
+        
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `money-${m+1}-${y}.csv`; a.click();
+        showToast('הייצוא הושלם', 'var(--income)');
+    } catch (error) {
+        handleError(error, 'exportToCSV');
+    }
 }
 
 function exportToJSON() {
-    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup.json'; a.click();
+    try {
+        const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
+        showToast('גיבוי נוצר בהצלחה', 'var(--income)');
+    } catch (error) {
+        handleError(error, 'exportToJSON');
+    }
 }
 
 function triggerImportJSON() { document.getElementById('importJsonFile').click(); }
@@ -660,21 +849,31 @@ document.getElementById('importJsonFile').addEventListener('change', function(ev
         if(!db) { showToast('אין חיבור לענן', 'var(--expense)'); return; }
         try {
             const data = JSON.parse(e.target.result);
-            if(!Array.isArray(data)) throw new Error();
+            if(!Array.isArray(data)) throw new Error('Invalid format: expected array');
             const validTypes = ['income','expense','fixed'];
             const batch = {};
-            data.forEach(item => {
+            data.forEach((item, index) => {
                 if(item.id && item.desc && typeof item.amount === 'number' && validTypes.includes(item.type)) {
                     batch[item.id] = item;
+                } else {
+                    console.warn(`Skipping invalid item at index ${index}:`, item);
                 }
             });
-            if(Object.keys(batch).length === 0) throw new Error('no valid items');
+            if(Object.keys(batch).length === 0) throw new Error('No valid items found in file');
+            
             db.update(batch)
-              .then(() => showToast('שוחזרו בהצלחה ✓', 'var(--income)'))
-              .catch(() => showToast('שגיאה בשחזור', 'var(--expense)'));
-        } catch { showToast('קובץ לא תקין', 'var(--expense)'); }
+              .then(() => {
+                  showToast(`שוחזרו ${Object.keys(batch).length} פריטים בהצלחה ✓`, 'var(--income)');
+                  cache.monthlyFixed.clear();
+              })
+              .catch(error => handleError(error, 'importJSON.update'));
+        } catch (error) {
+            handleError(error, 'importJSON.parse');
+        }
     };
-    reader.readAsText(file); ev.target.value = '';
+    reader.onerror = (error) => handleError(error, 'importJSON.reader');
+    reader.readAsText(file); 
+    ev.target.value = '';
 });
 
 function changeMonth(n) {
@@ -691,6 +890,8 @@ function showToast(msg, color) {
     if(msg.includes('נמחק')) iconEmoji = "🗑️";
     if(msg.includes('פרטיות')) iconEmoji = "🔒";
     if(msg.includes('רגילה')) iconEmoji = "👁️";
+    if(msg.includes('גיבוי') || msg.includes('ייצוא')) iconEmoji = "💾";
+    if(msg.includes('שוחזרו')) iconEmoji = "🔄";
     document.getElementById('toastIcon').innerText = iconEmoji;
     document.getElementById('toastText').innerText = msg;
     const colorMap = {
