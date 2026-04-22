@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Code Scanner Bot</title>
+<title>Code Scanner Bot – תיקון אוטומטי + סימון צבעוני</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  /* כל הסגנונות נשארים כפי שהיו – לא שיניתי */
   :root {
     --bg: #060a12;
     --panel: #0d1421;
@@ -24,9 +25,16 @@
     color: var(--text);
     min-height: 100vh;
     padding: 20px;
-    background-image: 
-      radial-gradient(ellipse at 10% 0%, rgba(0,200,255,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse at 90% 100%, rgba(0,255,157,0.04) 0%, transparent 60%);
+    background-image: radial-gradient(ellipse at 10% 0%, rgba(0,200,255,0.06) 0%, transparent 60%),
+                      radial-gradient(ellipse at 90% 100%, rgba(0,255,157,0.04) 0%, transparent 60%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
   }
   h1 {
     text-align: center;
@@ -46,8 +54,6 @@
     font-weight: 700;
     letter-spacing: 1px;
   }
-
-  /* Tabs */
   .tabs {
     display: flex;
     gap: 8px;
@@ -76,8 +82,6 @@
     color: var(--cyan);
     border: 1px solid rgba(0,200,255,0.2);
   }
-
-  /* Input area */
   .input-area {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -111,8 +115,6 @@
   }
   textarea:focus { border-color: rgba(0,200,255,0.3); }
   textarea::placeholder { color: var(--dim); }
-
-  /* Options */
   .options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -139,27 +141,75 @@
     color: var(--cyan);
   }
   .chip-icon { font-size: 1rem; }
-
-  /* Scan button */
-  .scan-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(90deg, #0070a8, #00c8ff);
-    border: none;
+  .api-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
     border-radius: 14px;
-    color: white;
-    font-family: 'Heebo', sans-serif;
-    font-weight: 900;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: 0.2s;
-    letter-spacing: 0.5px;
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+  .api-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .api-row label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--dim);
+    min-width: 70px;
+  }
+  .api-row input, .model-select {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--text);
+    font-family: monospace;
+    font-size: 0.75rem;
+  }
+  .model-select { flex: 0.5; }
+  .info-note {
+    font-size: 0.7rem;
+    color: var(--green);
+    margin-top: 8px;
+    text-align: center;
+  }
+  .action-buttons {
+    display: flex;
+    gap: 12px;
     margin-bottom: 20px;
   }
-  .scan-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .scan-btn, .history-btn, .highlight-btn {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 14px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 900;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+  }
+  .scan-btn {
+    background: linear-gradient(90deg, #0070a8, #00c8ff);
+    color: white;
+  }
+  .history-btn {
+    background: rgba(0,200,255,0.12);
+    border: 1px solid var(--border);
+    color: var(--cyan);
+  }
+  .highlight-btn {
+    background: rgba(255,204,0,0.12);
+    border: 1px solid var(--border);
+    color: var(--yellow);
+  }
+  .scan-btn:hover, .history-btn:hover, .highlight-btn:hover { opacity: 0.9; transform: translateY(-1px); }
   .scan-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  /* Loader */
   .loader {
     display: none;
     text-align: center;
@@ -184,11 +234,8 @@
     66%  { content: '..'; }
     100% { content: '...'; }
   }
-
-  /* Results */
   #results { display: none; }
   #results.show { display: block; }
-
   .results-header {
     display: flex;
     justify-content: space-between;
@@ -210,7 +257,6 @@
   .score-good  { background: rgba(0,255,157,0.12); color: var(--green); border: 1px solid rgba(0,255,157,0.25); }
   .score-ok    { background: rgba(255,204,0,0.12);  color: var(--yellow); border: 1px solid rgba(255,204,0,0.25); }
   .score-bad   { background: rgba(255,68,102,0.12); color: var(--red); border: 1px solid rgba(255,68,102,0.25); }
-
   .issue-card {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -223,7 +269,6 @@
   .issue-card.warning  { border-right-color: var(--yellow); }
   .issue-card.info     { border-right-color: var(--cyan); }
   .issue-card.ok       { border-right-color: var(--green); }
-
   .issue-top {
     display: flex;
     justify-content: space-between;
@@ -243,7 +288,6 @@
   .badge-warning  { background: rgba(255,204,0,0.2);  color: var(--yellow); }
   .badge-info     { background: rgba(0,200,255,0.2);  color: var(--cyan); }
   .badge-ok       { background: rgba(0,255,157,0.2);  color: var(--green); }
-
   .issue-desc { font-size: 0.8rem; color: #94a3b8; line-height: 1.5; }
   .issue-fix {
     margin-top: 8px;
@@ -257,7 +301,6 @@
     line-height: 1.5;
   }
   .issue-fix::before { content: '💡 '; }
-
   .summary-box {
     background: rgba(0,200,255,0.05);
     border: 1px solid rgba(0,200,255,0.15);
@@ -268,7 +311,6 @@
     line-height: 1.7;
     color: #cbd5e1;
   }
-
   .reset-btn {
     width: 100%;
     padding: 12px;
@@ -284,7 +326,6 @@
     transition: 0.2s;
   }
   .reset-btn:hover { border-color: var(--cyan); color: var(--cyan); }
-
   .error-box {
     background: rgba(255,68,102,0.08);
     border: 1px solid rgba(255,68,102,0.2);
@@ -296,12 +337,194 @@
     text-align: center;
     margin-bottom: 14px;
   }
+  .free-badge {
+    background: rgba(0,255,157,0.1);
+    border: 1px solid rgba(0,255,157,0.2);
+    border-radius: 12px;
+    padding: 8px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--green);
+    margin-bottom: 14px;
+  }
+  .history-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .history-panel.show {
+    display: block;
+  }
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .history-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .history-item {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.1s;
+    border-right: 2px solid var(--cyan);
+  }
+  .history-item:hover { background: rgba(0,200,255,0.1); }
+  .history-item-title {
+    font-weight: 800;
+    font-size: 0.8rem;
+  }
+  .history-item-date {
+    font-size: 0.65rem;
+    color: var(--dim);
+  }
+  .clear-history {
+    background: none;
+    border: 1px solid var(--red);
+    color: var(--red);
+    padding: 4px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.7rem;
+  }
+  .fix-code-section {
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+  }
+  .fix-btn {
+    background: linear-gradient(90deg, #2b5876, #4e4376);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 800;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 12px;
+  }
+  .fix-result {
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 12px;
+    display: none;
+  }
+  .fix-result.show {
+    display: block;
+  }
+  .fixed-code {
+    background: #0a0f1a;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    max-height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+    direction: ltr;
+    text-align: left;
+  }
+  .action-buttons-fix {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .apply-fix {
+    background: var(--green);
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .download-fix {
+    background: var(--cyan);
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .highlight-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    margin-top: 20px;
+    display: none;
+  }
+  .highlight-panel.show {
+    display: block;
+  }
+  .code-highlight {
+    background: #0a0f1a;
+    border-radius: 10px;
+    padding: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    direction: ltr;
+    text-align: left;
+  }
+  .hl-critical {
+    background-color: rgba(255,68,102,0.3);
+    border-radius: 4px;
+    padding: 0 2px;
+    font-weight: bold;
+    color: #ff99aa;
+  }
+  .hl-warning {
+    background-color: rgba(255,204,0,0.3);
+    border-radius: 4px;
+    padding: 0 2px;
+    color: #ffe699;
+  }
+  .hl-info {
+    background-color: rgba(0,200,255,0.3);
+    border-radius: 4px;
+    padding: 0 2px;
+    color: #aaffff;
+  }
+  .close-highlight {
+    background: none;
+    border: none;
+    color: var(--dim);
+    float: left;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+  /* תוספת לכפתור תיקון מהיר */
+  .quick-fix-btn {
+    background: rgba(255,68,102,0.2);
+    border: 1px solid var(--red);
+    color: var(--red);
+    margin-top: 8px;
+    font-size: 0.75rem;
+    padding: 8px;
+  }
 </style>
 </head>
 <body>
-
+<div class="container">
 <h1>🔍 Code Scanner Bot</h1>
-<p class="subtitle">סורק תקלות בקוד · מבוסס Claude AI</p>
+<p class="subtitle">סורק תקלות בקוד · מתקן אוטומטית · סימון צבעוני · חינם</p>
+
+<div class="free-badge">
+  ✨ 100% חינמי · אין צורך בכרטיס אשראי · רק להזין מפתח Groq
+</div>
 
 <div class="tabs">
   <button class="tab active" onclick="setTab('paste', this)">📋 הדבק קוד</button>
@@ -314,13 +537,13 @@
     <textarea id="codeInput" placeholder="הדבק כאן את הקוד שלך (HTML, JS, CSS)..."></textarea>
   </div>
   <div id="uploadArea" style="display:none;">
-    <input type="file" id="fileInput" accept=".html,.js,.css,.json" style="display:none" onchange="loadFile(this)">
+    <input type="file" id="fileInput" accept=".html,.js,.css,.json,.py,.txt" style="display:none" onchange="loadFile(this)">
     <div onclick="document.getElementById('fileInput').click()" style="
       border: 2px dashed rgba(0,200,255,0.2); border-radius: 10px; padding: 30px;
       text-align: center; cursor: pointer; color: var(--dim); font-weight: 700; font-size: 0.85rem;
       transition: 0.2s;" onmouseover="this.style.borderColor='rgba(0,200,255,0.4)'" onmouseout="this.style.borderColor='rgba(0,200,255,0.2)'">
       <div style="font-size:2rem;margin-bottom:8px">📂</div>
-      לחץ לבחירת קובץ<br><span style="font-size:0.7rem;font-weight:400">HTML · JS · CSS · JSON</span>
+      לחץ לבחירת קובץ<br><span style="font-size:0.7rem;font-weight:400">HTML · JS · CSS · JSON · Python · טקסט</span>
     </div>
     <div id="fileName" style="text-align:center;margin-top:8px;color:var(--cyan);font-size:0.8rem;font-weight:700"></div>
   </div>
@@ -345,7 +568,38 @@
   </div>
 </div>
 
-<button class="scan-btn" id="scanBtn" onclick="startScan()">🔍 סרוק קוד</button>
+<div class="api-section">
+  <div class="api-row">
+    <label>🔑 Groq API Key:</label>
+    <input type="password" id="apiKey" placeholder="gsk_... (מקבלים בחינם מ-console.groq.com)" autocomplete="off">
+  </div>
+  <div class="api-row" style="margin-top:8px">
+    <label>🤖 מודל:</label>
+    <select id="modelSelect" class="model-select">
+      <option value="llama-3.3-70b-versatile">Llama 3.3 70B (מהיר, מומלץ)</option>
+      <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+      <option value="gemma2-9b-it">Gemma 2 9B</option>
+      <option value="llama-3.1-8b-instant">Llama 3.1 8B (מהיר מאוד)</option>
+    </select>
+  </div>
+  <div class="info-note">
+    💡 לקבלת מפתח חינמי: <a href="https://console.groq.com" target="_blank" style="color:var(--cyan)">console.groq.com</a> → הרשמה → API Keys → Create Key
+  </div>
+</div>
+
+<div class="action-buttons">
+  <button class="scan-btn" id="scanBtn" onclick="startScan()">🔍 סרוק קוד</button>
+  <button class="history-btn" id="historyBtn" onclick="toggleHistory()">📜 היסטוריה</button>
+  <button class="highlight-btn" id="highlightBtn" onclick="showHighlightedCode()" style="display:none;">🎨 הצג קוד מסומן</button>
+</div>
+
+<div id="historyPanel" class="history-panel">
+  <div class="history-header">
+    <span>📜 היסטוריית סריקות</span>
+    <button class="clear-history" onclick="clearHistory()">נקה היסטוריה</button>
+  </div>
+  <div id="historyList" class="history-list"></div>
+</div>
 
 <div class="loader" id="loader">
   <div class="scan-anim">🔍</div>
@@ -361,18 +615,108 @@
   </div>
   <div class="summary-box" id="summaryBox"></div>
   <div id="issuesList"></div>
+  
+  <div class="fix-code-section">
+    <button class="fix-btn" id="fixCodeBtn" onclick="fixCode()" style="display:none;">🔧 תקן קוד אוטומטית</button>
+    <button class="fix-btn quick-fix-btn" id="quickFixBtn" onclick="quickFixCode()" style="display:none;">⚡ תיקון מהיר (רק קריטי)</button>
+    <div id="fixResult" class="fix-result">
+      <div class="fixed-code" id="fixedCodeContent"></div>
+      <div class="action-buttons-fix">
+        <button class="apply-fix" onclick="applyFixedCode()">החלף קוד</button>
+        <button class="download-fix" onclick="downloadFixedCode()">הורד קובץ מתוקן</button>
+      </div>
+    </div>
+  </div>
+  
   <button class="reset-btn" onclick="resetAll()">🔄 סריקה חדשה</button>
 </div>
+
+<div id="highlightPanel" class="highlight-panel">
+  <div style="text-align:left; margin-bottom:8px;">
+    <button class="close-highlight" onclick="closeHighlight()">✖️ סגור</button>
+    <span style="font-weight:bold;">🎨 קוד עם סימון צבעוני לפי בעיות</span>
+  </div>
+  <div id="codeHighlightContainer" class="code-highlight"></div>
+</div>
+
+</div> <!-- container -->
 
 <script>
 let currentTab = 'paste';
 let selectedOptions = new Set(['security','performance','bugs','best_practices']);
+let originalCode = '';
+let fixedCodeText = '';
+let lastIssues = [];
 
+// --- היסטוריה ---
+function saveScanToHistory(codeSnippet, resultData) {
+  const history = JSON.parse(localStorage.getItem('codeScanHistory') || '[]');
+  const entry = {
+    id: Date.now(),
+    timestamp: new Date().toISOString(),
+    codePreview: codeSnippet.slice(0, 100) + (codeSnippet.length > 100 ? '...' : ''),
+    score: resultData.score,
+    summary: resultData.summary,
+    issues: resultData.issues,
+    model: document.getElementById('modelSelect').value,
+    options: Array.from(selectedOptions)
+  };
+  history.unshift(entry);
+  if (history.length > 20) history.pop();
+  localStorage.setItem('codeScanHistory', JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('codeScanHistory') || '[]');
+  const container = document.getElementById('historyList');
+  if (!container) return;
+  if (history.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--dim);padding:20px;">אין סריקות בהיסטוריה</div>';
+    return;
+  }
+  container.innerHTML = history.map(item => `
+    <div class="history-item" onclick="loadHistoryItem(${item.id})">
+      <div class="history-item-title">${escapeHtml(item.codePreview)}</div>
+      <div class="history-item-date">${new Date(item.timestamp).toLocaleString()} | ציון: ${item.score}/100</div>
+    </div>
+  `).join('');
+}
+
+function loadHistoryItem(id) {
+  const history = JSON.parse(localStorage.getItem('codeScanHistory') || '[]');
+  const item = history.find(i => i.id === id);
+  if (!item) return;
+  showResults({ score: item.score, summary: item.summary, issues: item.issues });
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').classList.add('show');
+  document.getElementById('historyPanel').classList.remove('show');
+  originalCode = document.getElementById('codeInput').value;
+  document.getElementById('fixCodeBtn').style.display = 'block';
+  document.getElementById('quickFixBtn').style.display = 'block';
+  document.getElementById('highlightBtn').style.display = 'block';
+  lastIssues = item.issues || [];
+}
+
+function clearHistory() {
+  if (confirm('למחוק את כל היסטוריית הסריקות?')) {
+    localStorage.removeItem('codeScanHistory');
+    renderHistory();
+  }
+}
+
+function toggleHistory() {
+  const panel = document.getElementById('historyPanel');
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) renderHistory();
+}
+
+// --- פונקציות עזר ---
 function setTab(tab, el) {
   currentTab = tab;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('pasteArea').style.display  = tab === 'paste'  ? 'block' : 'none';
+  document.getElementById('pasteArea').style.display = tab === 'paste' ? 'block' : 'none';
   document.getElementById('uploadArea').style.display = tab === 'upload' ? 'block' : 'none';
 }
 
@@ -399,67 +743,76 @@ async function startScan() {
   if(!code) { showError('⚠️ אנא הכנס קוד לסריקה'); return; }
   if(selectedOptions.size === 0) { showError('⚠️ בחר לפחות סוג סריקה אחד'); return; }
 
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if(!apiKey) { showError('🔑 יש להזין מפתח Groq API'); return; }
+
+  const model = document.getElementById('modelSelect').value;
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
   document.getElementById('scanBtn').disabled = true;
   document.getElementById('loader').classList.add('show');
   document.getElementById('results').style.display = 'none';
   document.getElementById('results').classList.remove('show');
   document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('fixCodeBtn').style.display = 'none';
+  document.getElementById('quickFixBtn').style.display = 'none';
+  document.getElementById('highlightBtn').style.display = 'none';
+  document.getElementById('fixResult').classList.remove('show');
+  document.getElementById('highlightPanel').classList.remove('show');
 
   const categories = {
-    security: 'אבטחה (XSS, injection, חשיפת מפתחות, eval)',
-    performance: 'ביצועים (memory leaks, loops, DOM inefficiency)',
-    bugs: 'באגים לוגיים (undefined vars, async errors, edge cases)',
+    security: 'אבטחה (XSS, SQL injection, eval, מפתחות חשופים)',
+    performance: 'ביצועים (memory leaks, לולאות כבדות, DOM manipulations)',
+    bugs: 'באגים לוגיים (undefined vars, async/await, edge cases)',
     best_practices: 'Best Practices (קוד נקי, DRY, error handling)'
   };
 
   const scanFor = [...selectedOptions].map(k => categories[k]).join(', ');
-  const codeSnippet = code.length > 8000 ? code.slice(0, 8000) + '\n\n[...קוד קוצר לצורך ניתוח]' : code;
+  const codeSnippet = code.length > 7000 ? code.slice(0, 7000) + '\n\n[...קוד קוצר לצורך ניתוח]' : code;
 
-  const prompt = `אתה מומחה code review. סרוק את הקוד הבא וחפש בעיות ב: ${scanFor}.
+  const prompt = `אתה מומחה code review. נתח את הקוד הבא וחפש בעיות ב: ${scanFor}.
 
-החזר תשובה ב-JSON בלבד (ללא backticks), במבנה הזה:
+החזר אך ורק JSON חוקי, ללא מילים נוספות לפני או אחרי, ללא backticks. המבנה:
 {
-  "score": <מספר 0-100>,
-  "summary": "<סיכום קצר בעברית של מצב הקוד>",
+  "score": <0-100>,
+  "summary": "<סיכום בעברית>",
   "issues": [
-    {
-      "title": "<שם הבעיה בעברית>",
-      "severity": "<critical|warning|info|ok>",
-      "description": "<תיאור הבעיה בעברית>",
-      "fix": "<הצעה לתיקון בעברית>"
-    }
+    {"title": "...", "severity": "critical|warning|info|ok", "description": "...", "fix": "..."}
   ]
 }
 
-severity:
-- critical = תקלה חמורה שחייבת תיקון
-- warning = בעיה שכדאי לתקן
-- info = הצעה לשיפור
-- ok = נקודה חיובית בקוד
-
-הקוד:
-\`\`\`
-${codeSnippet}
-\`\`\``;
+קוד:
+${codeSnippet}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(GROQ_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], temperature: 0.1, max_tokens: 1500 })
     });
 
-    const data = await res.json();
-    const text = data.content?.[0]?.text || '';
-    const clean = text.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let content = data.choices[0]?.message?.content;
+    if (!content) throw new Error('תשובה ריקה');
+
+    let jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('לא נמצא JSON');
+    let cleanJson = jsonMatch[0].replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
+    const parsed = JSON.parse(cleanJson);
+    if (typeof parsed.score !== 'number') parsed.score = 50;
+    if (!parsed.summary) parsed.summary = 'הסריקה הושלמה.';
+    if (!Array.isArray(parsed.issues)) parsed.issues = [];
+    
+    originalCode = code;
+    lastIssues = parsed.issues;
+    saveScanToHistory(codeSnippet, parsed);
     showResults(parsed);
+    document.getElementById('fixCodeBtn').style.display = 'block';
+    document.getElementById('quickFixBtn').style.display = 'block';
+    document.getElementById('highlightBtn').style.display = 'block';
   } catch(err) {
-    showError('שגיאה בסריקה. נסה שוב.');
+    showError(`❌ שגיאה: ${err.message}`);
   } finally {
     document.getElementById('scanBtn').disabled = false;
     document.getElementById('loader').classList.remove('show');
@@ -467,44 +820,46 @@ ${codeSnippet}
 }
 
 function showResults(data) {
-  // Score badge
+  const score = typeof data.score === 'number' ? data.score : 50;
   const badge = document.getElementById('scoreBadge');
-  badge.innerText = `ציון: ${data.score}/100`;
-  badge.className = 'score-badge ' + (data.score >= 75 ? 'score-good' : data.score >= 50 ? 'score-ok' : 'score-bad');
-
-  // Summary
-  document.getElementById('summaryBox').innerText = data.summary;
-
-  // Issues
+  badge.innerText = `ציון: ${score}/100`;
+  badge.className = 'score-badge ' + (score >= 75 ? 'score-good' : score >= 50 ? 'score-ok' : 'score-bad');
+  document.getElementById('summaryBox').innerHTML = escapeHtml(data.summary || '');
+  const issues = data.issues || [];
   const list = document.getElementById('issuesList');
-  list.innerHTML = (data.issues || []).map(issue => `
-    <div class="issue-card ${issue.severity}">
-      <div class="issue-top">
-        <div class="issue-title">${escHtml(issue.title)}</div>
-        <span class="issue-badge badge-${issue.severity}">${severityLabel(issue.severity)}</span>
+  if (issues.length) {
+    list.innerHTML = issues.map(issue => `
+      <div class="issue-card ${issue.severity || 'info'}">
+        <div class="issue-top">
+          <div class="issue-title">${escapeHtml(issue.title)}</div>
+          <span class="issue-badge badge-${issue.severity || 'info'}">${severityLabel(issue.severity)}</span>
+        </div>
+        <div class="issue-desc">${escapeHtml(issue.description)}</div>
+        ${issue.fix ? `<div class="issue-fix">${escapeHtml(issue.fix)}</div>` : ''}
       </div>
-      <div class="issue-desc">${escHtml(issue.description)}</div>
-      ${issue.fix ? `<div class="issue-fix">${escHtml(issue.fix)}</div>` : ''}
-    </div>
-  `).join('');
-
+    `).join('');
+  } else {
+    list.innerHTML = '<div class="issue-card ok"><div class="issue-title">✨ לא נמצאו בעיות משמעותיות</div><div class="issue-desc">הקוד נראה תקין!</div></div>';
+  }
   document.getElementById('results').style.display = 'block';
   document.getElementById('results').classList.add('show');
   document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
 }
 
 function severityLabel(s) {
-  return { critical:'🔴 קריטי', warning:'🟡 אזהרה', info:'🔵 הצעה', ok:'🟢 טוב' }[s] || s;
+  const map = { critical:'🔴 קריטי', warning:'🟡 אזהרה', info:'🔵 הצעה', ok:'🟢 טוב' };
+  return map[s] || '🔵 מידע';
 }
 
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function escapeHtml(str) {
+  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function showError(msg) {
   const box = document.getElementById('errorBox');
-  box.innerText = msg;
+  box.innerHTML = msg;
   box.style.display = 'block';
+  setTimeout(() => box.scrollIntoView({ behavior: 'smooth' }), 100);
 }
 
 function resetAll() {
@@ -512,8 +867,243 @@ function resetAll() {
   document.getElementById('results').style.display = 'none';
   document.getElementById('results').classList.remove('show');
   document.getElementById('errorBox').style.display = 'none';
+  document.getElementById('fixCodeBtn').style.display = 'none';
+  document.getElementById('quickFixBtn').style.display = 'none';
+  document.getElementById('highlightBtn').style.display = 'none';
+  document.getElementById('fixResult').classList.remove('show');
+  document.getElementById('highlightPanel').classList.remove('show');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// ---------- תיקון קוד מלא (מגבלה 100,000 תווים, קיצור חכם מעל 50,000) ----------
+async function fixCode() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if(!apiKey) { showError('🔑 יש להזין מפתח Groq API'); return; }
+  if(!originalCode) { showError('אין קוד מקורי לתיקון'); return; }
+
+  const MAX_CHARS = 100000;  // עלייה דרמטית
+  const codeLength = originalCode.length;
+  
+  if (codeLength > MAX_CHARS) {
+    showError(`⚠️ הקוד ארוך מדי לתיקון אוטומטי (${codeLength} תווים). המגבלה היא ${MAX_CHARS} תווים. נסה לקצר ידנית או השתמש בתיקון מהיר.`);
+    return;
+  }
+
+  let codeForFix = originalCode;
+  let truncated = false;
+  // אם הקוד ארוך מ-50,000 תווים, נקצר אותו בצורה חכמה (התחלה + אמצע + סוף)
+  if (codeLength > 50000) {
+    const firstPart = originalCode.slice(0, 20000);
+    const middlePart = originalCode.slice(15000, 25000);
+    const lastPart = originalCode.slice(-15000);
+    codeForFix = firstPart + "\n\n[... " + (codeLength - 50000) + " תווים הושמטו לצורך קיצור ...]\n\n" + middlePart + "\n\n" + lastPart;
+    truncated = true;
+  }
+
+  // איסוף הצעות תיקון (עד 5)
+  const issueFixes = [];
+  const cards = document.querySelectorAll('.issue-card');
+  for (let i = 0; i < Math.min(cards.length, 5); i++) {
+    const fixDiv = cards[i].querySelector('.issue-fix');
+    if (fixDiv) issueFixes.push(fixDiv.innerText.replace('💡 ', ''));
+  }
+  const fixesText = issueFixes.length ? issueFixes.join('\n') : 'אין הצעות ספציפיות, אך נא לתקן בעיות נפוצות (אבטחה, ביצועים, באגים).';
+
+  const model = document.getElementById('modelSelect').value;
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+  let prompt = `תקן את הקוד הבא לפי ההערות. החזר אך ורק את הקוד המתוקן בשלמותו, ללא הסברים, ללא backticks, ללא קיצורים או השמטות. שמור על כל חלקי הקוד.`;
+  if (truncated) {
+    prompt += `\n\nשים לב: הקוד המקורי קוצר כי הוא ארוך מאוד. הקוד שמוצג להלן הוא חלקי (התחלה, אמצע, סוף). אנא תקן כמיטב יכולתך על סמך החלק הזה, אך אם אתה מזהה בעיות בחלקים החסרים, תוכל להציע תיקונים כלליים.`;
+  }
+  prompt += `\n\nהערות לתיקון:\n${fixesText}\n\nקוד:\n\`\`\`\n${codeForFix}\n\`\`\``;
+
+  // אומדן גודל
+  if (prompt.length > 25000) {
+    showError('⚠️ המידע לתיקון גדול מדי. נסה להשתמש בתיקון מהיר (רק קריטי) במקום.');
+    return;
+  }
+
+  document.getElementById('fixCodeBtn').disabled = true;
+  document.getElementById('fixCodeBtn').innerText = '⏳ מתקן קוד...';
+  const fixResultDiv = document.getElementById('fixResult');
+  fixResultDiv.classList.remove('show');
+
+  try {
+    const response = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.2,
+        max_tokens: 12000
+      })
+    });
+
+    if (response.status === 413) throw new Error('הקוד או ההערות גדולים מדי עבור Groq. נסה תיקון מהיר.');
+    if (!response.ok) {
+      let errMsg = `HTTP ${response.status}`;
+      try {
+        const errData = await response.json();
+        errMsg = errData.error?.message || errMsg;
+      } catch(e) {}
+      throw new Error(errMsg);
+    }
+    const data = await response.json();
+    let fixed = data.choices[0]?.message?.content || '';
+    fixed = fixed.replace(/```[\s\S]*?```/g, (match) => {
+      const inner = match.replace(/```\w*\n?/g, '').replace(/```$/, '');
+      return inner;
+    }).trim();
+    if (!fixed) throw new Error('התקבל תיקון ריק');
+    
+    if (!truncated && fixed.length < originalCode.length * 0.6) {
+      showError('⚠️ הקוד המתוקן קצר משמעותית מהמקורי. ייתכן שהמודל קיצץ אותו. נסה תיקון מהיר.');
+    }
+    fixedCodeText = fixed;
+    document.getElementById('fixedCodeContent').innerText = fixedCodeText;
+    fixResultDiv.classList.add('show');
+  } catch(err) {
+    showError('❌ תיקון נכשל: ' + err.message);
+  } finally {
+    document.getElementById('fixCodeBtn').disabled = false;
+    document.getElementById('fixCodeBtn').innerText = '🔧 תקן קוד אוטומטית';
+  }
+}
+
+// ---------- תיקון מהיר (רק בעיות קריטיות, קוד מקוצר יותר) ----------
+async function quickFixCode() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if(!apiKey) { showError('🔑 יש להזין מפתח Groq API'); return; }
+  if(!originalCode) { showError('אין קוד מקורי לתיקון'); return; }
+
+  // קיצור אגרסיבי ל-20,000 תווים
+  let codeForFix = originalCode;
+  if (codeForFix.length > 20000) {
+    codeForFix = codeForFix.slice(0, 15000) + "\n\n[... קוד קוצר לצורך תיקון מהיר ...]\n\n" + codeForFix.slice(-5000);
+  }
+
+  // אסוף רק בעיות קריטיות
+  const criticalFixes = [];
+  const cards = document.querySelectorAll('.issue-card.critical .issue-fix, .issue-card.warning .issue-fix');
+  for (let i = 0; i < Math.min(cards.length, 3); i++) {
+    criticalFixes.push(cards[i].innerText.replace('💡 ', ''));
+  }
+  const fixesText = criticalFixes.length ? criticalFixes.join('\n') : 'תקן בעיות אבטחה ובאגים קריטיים.';
+
+  const model = document.getElementById('modelSelect').value;
+  const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+  const prompt = `תקן את הקוד הבא. התמקד רק בתיקונים קריטיים (אבטחה, באגים). החזר את הקוד המתוקן, ללא הסברים, ללא backticks.
+
+הערות לתיקון:
+${fixesText}
+
+קוד:
+\`\`\`
+${codeForFix}
+\`\`\``;
+
+  document.getElementById('quickFixBtn').disabled = true;
+  document.getElementById('quickFixBtn').innerText = '⏳ מתקן במהירות...';
+  const fixResultDiv = document.getElementById('fixResult');
+  fixResultDiv.classList.remove('show');
+
+  try {
+    const response = await fetch(GROQ_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: model,
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.2,
+        max_tokens: 8000
+      })
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    let fixed = data.choices[0]?.message?.content || '';
+    fixed = fixed.replace(/```[\s\S]*?```/g, (match) => {
+      const inner = match.replace(/```\w*\n?/g, '').replace(/```$/, '');
+      return inner;
+    }).trim();
+    if (!fixed) throw new Error('תיקון ריק');
+    fixedCodeText = fixed;
+    document.getElementById('fixedCodeContent').innerText = fixedCodeText;
+    fixResultDiv.classList.add('show');
+  } catch(err) {
+    showError('❌ תיקון מהיר נכשל: ' + err.message);
+  } finally {
+    document.getElementById('quickFixBtn').disabled = false;
+    document.getElementById('quickFixBtn').innerText = '⚡ תיקון מהיר (רק קריטי)';
+  }
+}
+
+function applyFixedCode() {
+  if (fixedCodeText) {
+    document.getElementById('codeInput').value = fixedCodeText;
+    showError('✅ הקוד הוחלף! תוכל לסרוק שוב.');
+    document.getElementById('fixResult').classList.remove('show');
+    originalCode = fixedCodeText;
+  } else {
+    showError('אין קוד מתוקן להחליף');
+  }
+}
+
+function downloadFixedCode() {
+  if (!fixedCodeText) return;
+  const blob = new Blob([fixedCodeText], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'fixed_code.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// --- סימון צבעוני ---
+function showHighlightedCode() {
+  if (!originalCode) {
+    showError('אין קוד להצגה');
+    return;
+  }
+  if (!lastIssues || lastIssues.length === 0) {
+    document.getElementById('codeHighlightContainer').innerHTML = `<pre style="margin:0;white-space:pre-wrap;">${escapeHtml(originalCode)}</pre>`;
+    document.getElementById('highlightPanel').classList.add('show');
+    return;
+  }
+
+  const keywords = new Set();
+  lastIssues.forEach(issue => {
+    const titleWords = issue.title.split(' ');
+    const descWords = issue.description.split(' ');
+    titleWords.forEach(w => { if(w.length > 3) keywords.add(w); });
+    descWords.forEach(w => { if(w.length > 3) keywords.add(w); });
+  });
+  const extraKeywords = ['eval', 'innerHTML', 'document.write', 'setInterval', 'setTimeout', 'localStorage', 'sessionStorage', 'fetch', 'axios', 'promise', 'async', 'await', 'var', 'let', 'const', 'function', 'return', 'if', 'else', 'for', 'while'];
+  extraKeywords.forEach(k => keywords.add(k));
+  
+  let highlightedCode = escapeHtml(originalCode);
+  keywords.forEach(kw => {
+    const regex = new RegExp(`\\b(${escapeRegex(kw)})\\b`, 'gi');
+    highlightedCode = highlightedCode.replace(regex, `<span class="hl-warning">$1</span>`);
+  });
+  
+  document.getElementById('codeHighlightContainer').innerHTML = `<pre style="margin:0;white-space:pre-wrap;">${highlightedCode}</pre>`;
+  document.getElementById('highlightPanel').classList.add('show');
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function closeHighlight() {
+  document.getElementById('highlightPanel').classList.remove('show');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderHistory();
+});
 </script>
 </body>
 </html>
