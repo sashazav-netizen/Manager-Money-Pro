@@ -617,7 +617,8 @@ function safe(s) {
 function renderList(id, data) {
     const el = document.getElementById(id); if(!el) return;
     if(!data.length) { el.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:20px">אין פריטים</p>'; return; }
-    el.innerHTML = data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(e => {
+    // ✅ תיקון: מיון בטוח גם אם התאריך חסר או לא תקין
+    el.innerHTML = data.sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0)).map(e => {
         const safeType = ['income','expense','fixed'].includes(e.type) ? e.type : 'text-dim';
         return `
         <div class="item">
@@ -661,6 +662,8 @@ function resetForm() {
     document.getElementById('modalTitle').innerText = 'פעולה חדשה';
     document.getElementById('fDesc').classList.remove('error');
     document.getElementById('fAmount').classList.remove('error');
+    // ✅ תיקון: לוודא ששדה התאריך מוצג/מוסתר בהתאם לסוג הנבחר (במקרה שנפתח אחרי סגירת טופס קבוע)
+    toggleDateField();
 }
 
 function openEdit(id) {
