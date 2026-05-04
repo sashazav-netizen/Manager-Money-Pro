@@ -66,7 +66,6 @@
         .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--expense); flex-shrink: 0; }
         .status-dot.online { background: var(--income); box-shadow: 0 0 8px var(--income); animation: pulse-dot 2s infinite; }
         @keyframes pulse-dot { 0%,100%{ box-shadow: 0 0 6px var(--income); } 50%{ box-shadow: 0 0 14px var(--income); } }
-        /* FIX: tool buttons now have visible border/bg so they look clickable */
         .tool-btn {
             font-size: 1.2rem; cursor: pointer; color: var(--text-dim);
             background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
@@ -92,7 +91,6 @@
             padding: 18px 15px; border-radius: var(--card-radius); text-align: center; transition: transform 0.2s;
         }
         .stat-card:active { transform: scale(0.98); }
-        /* FIX: wide card split cleanly — no layout weirdness */
         .stat-card.wide { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
         .stat-card.wide .stat-half { padding: 4px 10px; }
         .stat-card.wide .stat-half:first-child { border-left: 1px solid var(--glass-border); }
@@ -103,7 +101,6 @@
         .val-current { color: var(--accent); text-shadow: 0 0 12px rgba(14,165,233,0.35); }
         .val-final { color: var(--balance-final); text-shadow: 0 0 12px rgba(245,158,11,0.35); }
 
-        /* FIX: EMPTY STATE — friendly, page-specific, with action CTA */
         .empty-state {
             text-align: center; padding: 50px 20px 30px;
             background: var(--glass); border: 1px dashed rgba(255,255,255,0.1);
@@ -120,7 +117,6 @@
         }
         .empty-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14,165,233,0.4); }
 
-        /* STATS GRID */
         .stats-grid-new { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .s-card-new {
             background: var(--glass); border: 1px solid var(--glass-border);
@@ -129,21 +125,17 @@
         .s-card-new:active { transform: scale(0.98); }
         .s-card-new b { font-size: 1.4rem; font-weight: 900; display: block; margin-bottom: 6px; }
         .s-card-new label { font-size: 0.68rem; color: var(--text-dim); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        /* FIX: each stat card has tinted bg to distinguish at a glance */
         .s-card-inc  { background: rgba(16,185,129,0.07);  border-color: rgba(16,185,129,0.2); }
         .s-card-exp  { background: rgba(244,63,94,0.07);   border-color: rgba(244,63,94,0.2); }
         .s-card-save { background: rgba(16,185,129,0.05);  border-color: rgba(16,185,129,0.15); }
         .s-card-bal  { background: rgba(14,165,233,0.07);  border-color: rgba(14,165,233,0.2); }
 
-        /* PROGRESS BAR */
         .progress-container { background: var(--glass); padding: 20px; border-radius: var(--card-radius); border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .progress-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 800; font-size: 0.9rem; }
         .bar-bg { background: rgba(255,255,255,0.06); height: 10px; border-radius: 10px; overflow: hidden; }
         .bar-fill { height: 100%; background: linear-gradient(90deg, var(--income), #34d399); width: 0%; transition: width 0.9s cubic-bezier(.4,0,.2,1), background 0.5s ease; border-radius: 10px; }
-        /* bar turns red when usage ≥80% */
         .bar-fill.danger { background: linear-gradient(90deg, var(--expense), #fb7185); }
 
-        /* SECTION TITLE */
         .stat-section-title {
             font-size: 0.76rem; font-weight: 900; color: var(--text-dim);
             margin: 28px 0 10px; text-transform: uppercase; letter-spacing: 0.8px;
@@ -151,7 +143,6 @@
         }
         .stat-section-title::before { content: ''; display: block; flex: 1; height: 1px; background: var(--glass-border); }
 
-        /* STAT ROW */
         .stat-row-new {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--glass); padding: 14px 16px; border-radius: 14px;
@@ -160,10 +151,8 @@
         .stat-row-new:hover { background: rgba(255,255,255,0.04); }
         .stat-row-new label { font-size: 0.85rem; font-weight: 700; color: var(--text); }
 
-        /* PRIVACY */
         .money.blur { filter: blur(12px) !important; pointer-events: none; opacity: 0.6; }
 
-        /* LIST ITEMS */
         .item {
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px;
             padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
@@ -173,7 +162,6 @@
         @keyframes fadeSlideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
         .item:hover { transform: translateX(-2px); }
         .item:active { transform: scale(0.99); }
-        /* type indicator: left border stripe */
         .item.type-income  { border-right: 3px solid var(--income); }
         .item.type-expense { border-right: 3px solid var(--expense); }
         .item.type-fixed   { border-right: 3px solid var(--fixed); }
@@ -181,10 +169,8 @@
         .trash-btn { color: var(--expense); font-size: 1rem; cursor: pointer; opacity: 0.45; margin-right: 12px; transition: opacity 0.2s, transform 0.2s; padding: 4px; }
         .trash-btn:hover { opacity: 1; transform: scale(1.15); }
 
-        /* FOOTER */
         .footer-copyright { text-align: center; font-size: 0.68rem; color: var(--text-dim); padding: 15px 0 100px 0; font-weight: 700; letter-spacing: 1px; opacity: 0.6; }
 
-        /* FIX: BOTTOM NAV — clear active state with underline indicator + scale */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; width: 100%; height: var(--nav-height);
             background: rgba(5,8,16,0.97); border-top: 1px solid var(--glass-border);
@@ -212,7 +198,6 @@
         .nav-item[data-page="charts"].active  { color: #a78bfa !important; }
         .nav-item[data-page="charts"].active::after  { background: #a78bfa; }
 
-        /* FIX: FAB with tooltip */
         .fab {
             position: fixed; bottom: 88px; left: 20px; width: 56px; height: 56px;
             background: var(--title-grad); border-radius: 50%;
@@ -232,7 +217,6 @@
         }
         .fab:not(.open):hover + .fab-tooltip { opacity: 1; }
 
-        /* OVERLAY & SHEETS */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; backdrop-filter: blur(5px); }
         .sheet {
             position: fixed; bottom: -100%; left: 0; width: 100%; background: #0f172a;
@@ -251,7 +235,6 @@
             outline: none; transition: border-color 0.25s, background 0.25s; font-size: 1rem;
             direction: rtl;
         }
-        /* FIX H: custom select arrow positioned correctly for RTL */
         select {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -262,7 +245,6 @@
         input:focus, select:focus { border-color: var(--accent); background: rgba(14,165,233,0.06); }
         input.error { border-color: var(--expense); background: rgba(244,63,94,0.1); }
         select option { background: #0f172a; }
-        /* FIX E: hide ugly number spinners on mobile */
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; appearance: textfield; }
@@ -280,7 +262,6 @@
         }
         .btn-cancel:hover { background: rgba(244,63,94,0.06); }
 
-        /* CONFIRM BOX */
         .confirm-box {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
             background: #1e293b; padding: 28px; border-radius: 24px; border: 1px solid var(--glass-border);
@@ -292,12 +273,10 @@
         .confirm-box h3 { margin: 0 0 10px; font-size: 1.1rem; }
         .confirm-box p  { color: var(--text-dim); margin-bottom: 22px; font-size: 0.9rem; line-height: 1.5; }
 
-        /* PAGES */
         .page { display: none; }
         .page.active { display: block; animation: pageIn 0.22s ease both; }
         @keyframes pageIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
 
-        /* CHARTS */
         .chart-box {
             background: var(--glass); padding: 20px; border-radius: var(--card-radius);
             border: 1px solid var(--glass-border); margin-bottom: 15px;
@@ -306,7 +285,6 @@
         .chart-box h3 { margin: 0 0 16px; font-size: 0.78rem; font-weight: 900; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; align-self: flex-start; }
         .pie-container { max-width: 160px; width: 100%; margin: 0 auto; }
 
-        /* SETTINGS */
         .settings-btn {
             width: 100%; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.04);
             border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right;
@@ -316,7 +294,6 @@
         .settings-btn:hover { background: rgba(255,255,255,0.07); transform: translateX(-2px); }
         .settings-btn span { font-size: 1.2rem; }
 
-        /* FIX: ONBOARDING — first-run welcome screen */
         #onboardingOverlay {
             position: fixed; inset: 0; background: #050810; z-index: 9000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -347,7 +324,6 @@
         .onboard-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(14,165,233,0.5); }
         .onboard-skip { margin-top: 14px; font-size: 0.78rem; color: var(--text-dim); cursor: pointer; text-decoration: underline; }
 
-        /* FIX G: loading skeleton shown while Firebase connects */
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 9999;
             background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
@@ -357,7 +333,6 @@
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
         #loadingBar.hidden { display: none; }
 
-        /* iOS scroll-lock fix: save scroll position before locking */
         body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 
         @media (max-width: 360px) {
@@ -369,7 +344,6 @@
 </head>
 <body>
 
-<!-- ONBOARDING — shown only on first visit -->
 <div id="loadingBar"></div>
 <div id="onboardingOverlay">
     <div class="onboard-logo">💎</div>
@@ -396,7 +370,6 @@
 <div class="privacy-toast" id="privacyToast"><span id="toastIcon"></span><span id="toastText"></span></div>
 <div class="overlay" id="overlay" onclick="closeAllSheets()"></div>
 
-<!-- CONFIRM BOX -->
 <div class="confirm-box" id="confirmBox">
     <h3 id="confirmTitle">אישור</h3>
     <p id="confirmMsg"></p>
@@ -406,7 +379,6 @@
     </div>
 </div>
 
-<!-- ADD/EDIT SHEET -->
 <div class="sheet" id="sheet">
     <div class="sheet-handle"></div>
     <h2 id="modalTitle" style="text-align:center;margin:0 0 22px;font-size:1.1rem;">פעולה חדשה</h2>
@@ -424,7 +396,6 @@
     <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
 </div>
 
-<!-- SETTINGS SHEET -->
 <div class="sheet" id="settingsSheet">
     <div class="sheet-handle"></div>
     <h2 style="text-align:center;margin:0 0 22px;font-size:1.1rem;">הגדרות וגיבוי</h2>
@@ -432,14 +403,12 @@
     <button class="settings-btn" onclick="exportToJSON()"><span>💾</span> גיבוי מסד נתונים מלא (JSON)</button>
     <button class="settings-btn" onclick="triggerImportJSON()"><span>📂</span> שחזור מגיבוי (JSON)</button>
     <input type="file" id="importJsonFile" accept=".json" style="display:none">
-    <!-- FIX: honest cloud status — shows real connection state, not hardcoded text -->
     <div style="text-align:center;margin-top:20px;padding:14px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid var(--glass-border);font-size:0.82rem;color:var(--text-dim);line-height:1.65;">
         <span id="settingsCloudText">בודק חיבור...</span>
     </div>
     <button class="btn-cancel" onclick="toggleSettings()">סגור</button>
 </div>
 
-<!-- MAIN CONTAINER -->
 <div class="container">
     <header>
         <div class="brand">
@@ -462,10 +431,8 @@
         <button class="nav-btn" onclick="changeMonth(1)" title="חודש הבא" aria-label="חודש הבא">◂</button>
     </div>
 
-    <!-- HOME -->
     <div id="page-home" class="page active">
         <div class="main-stats">
-            <!-- FIX: "wide" card — clearly labeled, no duplicate "יתרה" confusion -->
             <div class="stat-card wide">
                 <div class="stat-half" style="border-left:1px solid var(--glass-border)">
                     <label>יתרה נוכחית</label>
@@ -485,7 +452,6 @@
                 <b id="bExp" class="money" style="color:var(--expense)">₪0</b>
             </div>
         </div>
-        <!-- FIX: empty state with action CTA -->
         <div class="empty-state" id="homeEmpty">
             <div class="empty-icon">💡</div>
             <h3>אין פעולות עדיין</h3>
@@ -495,7 +461,6 @@
         <div id="list-home"></div>
     </div>
 
-    <!-- INCOME -->
     <div id="page-income" class="page">
         <div class="empty-state" id="incomeEmpty">
             <div class="empty-icon">💰</div>
@@ -506,7 +471,6 @@
         <div id="list-income"></div>
     </div>
 
-    <!-- EXPENSE -->
     <div id="page-expense" class="page">
         <div class="empty-state" id="expenseEmpty">
             <div class="empty-icon">💸</div>
@@ -517,7 +481,6 @@
         <div id="list-expense"></div>
     </div>
 
-    <!-- FIXED -->
     <div id="page-fixed" class="page">
         <div class="empty-state" id="fixedEmpty">
             <div class="empty-icon">🔄</div>
@@ -528,9 +491,7 @@
         <div id="list-fixed"></div>
     </div>
 
-    <!-- STATS -->
     <div id="page-stats" class="page">
-        <!-- FIX: 4 unique stat cards — no duplicate "יתרה", each with tinted background -->
         <div class="stats-grid-new">
             <div class="s-card-new s-card-exp"><b id="sExp" class="money" style="color:var(--expense)">₪0</b><label>סה"כ הוצאות</label></div>
             <div class="s-card-new s-card-inc"><b id="sInc" class="money" style="color:var(--income)">₪0</b><label>הכנסות החודש</label></div>
@@ -557,7 +518,6 @@
         <div class="stat-row-new"><label>סה"כ פעולות</label><b id="actTotal" style="color:var(--text-dim)">0 פעולות</b></div>
     </div>
 
-    <!-- CHARTS -->
     <div id="page-charts" class="page">
         <div id="chartsEmpty" style="display:none;text-align:center;padding:60px 20px;">
             <div style="font-size:3.5rem;margin-bottom:18px;opacity:0.55">📊</div>
@@ -573,7 +533,6 @@
     <div class="footer-copyright">© 2026 ALEXANDER-ZAVODISKER</div>
 </div>
 
-<!-- FIX: Bottom nav uses data-page for CSS-driven active colors — removed inline style overrides -->
 <nav class="bottom-nav" role="navigation" aria-label="ניווט ראשי">
     <div class="nav-item active" data-page="home"    role="button" aria-label="בית"       onclick="showPage('home',this)"><span>🏠</span><label>בית</label></div>
     <div class="nav-item"        data-page="income"  role="button" aria-label="הכנסות"    onclick="showPage('income',this)"><span>↗️</span><label>הכנסות</label></div>
@@ -587,30 +546,44 @@
 <div class="fab-tooltip">הוסף פעולה</div>
 
 <script>
+// ========== תיקון 1: Firebase Configuration עם אזהרה ==========
 const firebaseConfig = {
     apiKey: "AIzaSyAZ2-EJjvIbDvtKLwKg3LObkIAs8sNhyjU",
     authDomain: "managermoney-49d0e.firebaseapp.com",
     projectId: "managermoney-49d0e",
     databaseURL: "https://managermoney-49d0e-default-rtdb.europe-west1.firebasedatabase.app",
 };
+
+// אזהרה על חשיפת מפתח API
+if (firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10) {
+    console.warn("⚠️ שימוש במפתח API ברירת מחדל בלקוח - מומלץ להעביר ל-environment variables לפרויקט Production");
+}
+
 firebase.initializeApp(firebaseConfig);
 
-// ── Restore last viewed month from sessionStorage ──────────────────────────
+// Restore last viewed month from sessionStorage
 const _saved = sessionStorage.getItem('mm_viewDate');
 
 let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date();
 
-let _savedScrollY = 0;
+// FIX 5: _savedScrollY כבר לא גלובלי - עכשיו מאוחסן על ה-body
 function lockBodyScroll() {
-    _savedScrollY = window.scrollY;
-    document.body.style.top = `-${_savedScrollY}px`;
+    const scrollY = window.scrollY;
+    document.body.style.top = `-${scrollY}px`;
     document.body.classList.add('modal-open');
+    document.body.dataset.scrollY = scrollY;
 }
+
+// FIX 2: תיקון iOS Scroll
 function unlockBodyScroll() {
     document.body.classList.remove('modal-open');
     document.body.style.top = '';
-    window.scrollTo(0, _savedScrollY);
+    const scrollY = parseInt(document.body.dataset.scrollY || '0');
+    setTimeout(() => {
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+    }, 10);
 }
+
 let isPrivate = false;
 let pendingEditId = null, pendingDeleteId = null;
 let isFabOpen = false, isSettingsOpen = false;
@@ -621,6 +594,7 @@ let cache = { monthlyFixed: new Map(), lastCacheClear: Date.now() };
 function clearCacheIfNeeded() {
     if (Date.now() - cache.lastCacheClear > 60000) { cache.monthlyFixed.clear(); cache.lastCacheClear = Date.now(); }
 }
+
 function getMonthlyFixed(year, month) {
     clearCacheIfNeeded();
     const key = `${year}-${month}`;
@@ -636,17 +610,19 @@ function getMonthlyFixed(year, month) {
     return total;
 }
 
-// FIX: Onboarding — show only on first visit, save flag in localStorage
 function dismissOnboarding() {
     const el = document.getElementById('onboardingOverlay');
-    el.classList.add('hidden');
-    setTimeout(() => el.remove(), 500);
+    if (el) {
+        el.classList.add('hidden');
+        setTimeout(() => { if (el && el.parentNode) el.remove(); }, 500);
+    }
     localStorage.setItem('mm_onboarded', '1');
 }
+
 function checkOnboarding() {
     if (localStorage.getItem('mm_onboarded')) {
         const el = document.getElementById('onboardingOverlay');
-        if (el) el.remove();
+        if (el && el.parentNode) el.remove();
     }
 }
 
@@ -655,11 +631,13 @@ function validateAmount(v) {
     if (v > 999999999)         { showToast('סכום גדול מדי','var(--expense)'); return false; }
     return true;
 }
+
 function validateDescription(d) {
     if (!d || !d.trim()) { showToast('נא להזין תיאור','var(--expense)'); return false; }
     if (d.length > 100)  { showToast('תיאור לא יכול לעלות על 100 תווים','var(--expense)'); return false; }
     return true;
 }
+
 function validateDate(s, type) {
     if (type === 'fixed') return true;
     if (!s) { showToast('נא לבחור תאריך','var(--expense)'); return false; }
@@ -696,7 +674,6 @@ function init() {
         db.on('value', snap => {
             try {
                 entries = snap.val() ? Object.values(snap.val()) : [];
-                // FIX G: hide loading bar once data arrives
                 document.getElementById('loadingBar').classList.add('hidden');
                 render();
                 if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
@@ -727,7 +704,9 @@ function validateAndAsk() {
     };
     askSaveConfirm();
 }
+
 function toggleDateField() { document.getElementById('fDate').style.display = document.getElementById('fType').value==='fixed' ? 'none' : 'block'; }
+
 function resetForm() {
     document.getElementById('fDesc').value='';
     document.getElementById('fAmount').value='';
@@ -738,9 +717,9 @@ function resetForm() {
     document.getElementById('modalTitle').innerText='פעולה חדשה';
     toggleDateField();
 }
+
 function openEdit(id) {
     const e=entries.find(x=>x.id===id); if(!e) return;
-    // If sheet already open, reset state cleanly before reopening with edit data
     if (isFabOpen) {
         isFabOpen=false;
         document.getElementById('mainFab').classList.remove('open');
@@ -754,9 +733,9 @@ function openEdit(id) {
     document.getElementById('fDate').value=(e.type==='fixed'&&!e.date)?'':(e.date||new Date().toISOString().split('T')[0]);
     toggleDateField();
     document.getElementById('modalTitle').innerText='עריכת פעולה';
-    toggleFab(); // always opens fresh
+    toggleFab();
 }
-// FIX: empty-state CTAs open sheet with correct type pre-selected
+
 function openSheetWithType(type) {
     resetForm();
     document.getElementById('fType').value=type;
@@ -765,24 +744,26 @@ function openSheetWithType(type) {
 }
 
 function askSaveConfirm() { pendingAction='save'; showConfirm("שמירה","לעדכן את הנתונים לענן?","var(--accent)"); }
+
 function askDeleteConfirm(id) {
     pendingDeleteId=id; pendingAction='delete';
     const e=entries.find(x=>x.id===id);
     showConfirm("מחיקה",`למחוק את "${safe(e?e.desc:'פעולה זו')}"?`,"var(--expense)");
 }
+
 function showConfirm(title,msg,color) {
     document.getElementById('confirmTitle').innerText=title;
     document.getElementById('confirmMsg').innerText=msg;
     document.getElementById('confirmExecBtn').style.background=color;
     const box=document.getElementById('confirmBox');
     box.style.display='block';
-    // Trigger reflow then add animation class
     box.classList.remove('anim');
     void box.offsetWidth;
     box.classList.add('anim');
     document.getElementById('overlay').style.zIndex='2500';
     document.getElementById('overlay').style.display='block';
 }
+
 function executeConfirmed() {
     if (!db) { showToast('אין חיבור לענן','var(--expense)'); closeConfirm(); return; }
     const btn=document.getElementById('confirmExecBtn');
@@ -790,18 +771,30 @@ function executeConfirmed() {
     if (pendingAction==='save') {
         if (!pendingSaveData) { closeConfirm(); return; }
         db.child(pendingSaveData.id).set(pendingSaveData)
-          .then(()=>{ showToast('נשמר','var(--income)'); cache.monthlyFixed.clear(); pendingSaveData=null; pendingEditId=null; })
+          .then(()=>{ showToast('נשמר','var(--income)'); cache.monthlyFixed.clear(); })
           .catch(e=>handleError(e,'save'))
-          .finally(()=>{ btn.disabled=false; btn.style.opacity='1'; });
+          .finally(()=>{ 
+              btn.disabled=false; btn.style.opacity='1';
+              // FIX 4: איפוס pending actions
+              pendingSaveData = null; 
+              pendingEditId = null;
+              pendingDeleteId = null;
+              pendingAction = null;
+          });
     } else if (pendingAction==='delete') {
         db.child(pendingDeleteId).remove()
-          .then(()=>{ showToast('נמחק',null); cache.monthlyFixed.clear(); pendingDeleteId=null; })
+          .then(()=>{ showToast('נמחק',null); cache.monthlyFixed.clear(); })
           .catch(e=>handleError(e,'delete'))
-          .finally(()=>{ btn.disabled=false; btn.style.opacity='1'; });
+          .finally(()=>{ 
+              btn.disabled=false; btn.style.opacity='1';
+              pendingDeleteId = null;
+              pendingAction = null;
+          });
     }
     closeConfirm();
     if (isFabOpen) toggleFab();
 }
+
 function closeConfirm() {
     document.getElementById('confirmBox').style.display='none';
     document.getElementById('overlay').style.zIndex='2000';
@@ -819,24 +812,29 @@ function toggleFab() {
     if(isFabOpen||isSettingsOpen) lockBodyScroll(); else unlockBodyScroll();
     if (!isFabOpen) { pendingEditId=null; resetForm(); }
 }
+
 function toggleSettings() {
     isSettingsOpen=!isSettingsOpen;
     document.getElementById('settingsSheet').classList.toggle('open');
     document.getElementById('overlay').style.display=(isFabOpen||isSettingsOpen)?'block':'none';
     if(isFabOpen||isSettingsOpen) lockBodyScroll(); else unlockBodyScroll();
 }
+
 function closeAllSheets() { if(isFabOpen) toggleFab(); if(isSettingsOpen) toggleSettings(); }
+
 function togglePrivacy() {
     isPrivate=!isPrivate;
     document.getElementById('eyeBtn').classList.toggle('active');
     showToast(isPrivate?"מצב פרטיות פעיל":"תצוגה רגילה",isPrivate?null:'var(--income)');
     applyPrivacyUI();
 }
+
 function applyPrivacyUI() {
     document.querySelectorAll('.money').forEach(el=>{
         if(!el.closest('.chart-box')) isPrivate?el.classList.add('blur'):el.classList.remove('blur');
     });
 }
+
 function showPage(p,el) {
     document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(nv=>nv.classList.remove('active'));
@@ -845,12 +843,14 @@ function showPage(p,el) {
     window.scrollTo({top:0,behavior:'smooth'});
     if(p==='charts') updateCharts();
 }
+
 function changeMonth(n) {
     viewDate=new Date(viewDate.getFullYear(),viewDate.getMonth()+n,1);
     sessionStorage.setItem('mm_viewDate',viewDate.toISOString());
     render();
     if(document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
+
 function safe(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function render() {
@@ -884,7 +884,6 @@ function render() {
     document.getElementById('sUsePerc').style.color=usePerc>=80?'var(--expense)':'var(--accent)';
     const bar=document.getElementById('sBar');
     bar.style.width=`${Math.min(usePerc,100)}%`;
-    // FIX: progress bar turns red when spending ≥80%
     bar.className='bar-fill'+(usePerc>=80?' danger':'');
 
     const prev=new Date(y,m-1,1);
@@ -928,7 +927,6 @@ function render() {
     document.getElementById('topExpList').innerHTML=top3.length===0
         ?'<p style="text-align:center;color:var(--text-dim);padding:10px 0;font-size:0.85rem">אין הוצאות החודש</p>'
         :top3.map((e,i)=>{
-            // FIX C: percentage from variable expenses only (correct — fixed are separate)
             const p=exp>0?Math.round((e.amount/exp)*100):0;
             return `<div class="stat-row-new" style="flex-direction:column;align-items:flex-end;gap:4px;">
                 <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
@@ -952,13 +950,21 @@ function render() {
     applyPrivacyUI();
 }
 
-// FIX: renderList controls empty state visibility per page
+// FIX 3: renderList עם מיון מתוקן - fixed ללא date מופיעים ראשונים
 function renderList(id,data,emptyId){
     const el=document.getElementById(id); if(!el) return;
     const empty=emptyId?document.getElementById(emptyId):null;
     if(!data.length){ el.innerHTML=''; if(empty) empty.style.display='block'; return; }
     if(empty) empty.style.display='none';
-    el.innerHTML=data.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0)).map(e=>{
+    el.innerHTML=data.sort((a,b) => {
+        // Fixed without date come first
+        if (a.type === 'fixed' && !a.date) return -1;
+        if (b.type === 'fixed' && !b.date) return 1;
+        // Otherwise sort by date descending
+        const dateA = new Date(a.date || 0);
+        const dateB = new Date(b.date || 0);
+        return dateB - dateA;
+    }).map(e=>{
         const st=['income','expense','fixed'].includes(e.type)?e.type:'text-dim';
         const typeClass=e.type==='income'?'type-income':e.type==='expense'?'type-expense':e.type==='fixed'?'type-fixed':'';
         return `<div class="item ${typeClass}">
@@ -986,19 +992,16 @@ function updateCharts(){
     for(let i=5;i>=0;i--){
         const d=new Date(viewDate.getFullYear(),viewDate.getMonth()-i,1);
         labels.push(new Intl.DateTimeFormat('he-IL',{month:'short'}).format(d));
-        // Filter only income/expense entries with a date for this month
         const mD=entries.filter(e=>{
             if(!e.date || e.type==='fixed') return false;
             const ed=new Date(e.date);
             return !isNaN(ed.getTime()) && ed.getMonth()===d.getMonth() && ed.getFullYear()===d.getFullYear();
         });
-        // Fixed totals come from getMonthlyFixed (handles entries with and without dates)
         const mf=getMonthlyFixed(d.getFullYear(),d.getMonth());
         ds.inc.push(mD.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0));
         ds.exp.push(mD.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0));
         ds.fix.push(mf);
     }
-    // Index 5 = current (most recent) month in 6-month window
     const cI=ds.inc[5], cE=ds.exp[5], cF=ds.fix[5];
     if(charts.bar){charts.bar.destroy();ctxBar.clearRect(0,0,ctxBar.canvas.width,ctxBar.canvas.height);}
     charts.bar=new Chart(ctxBar,{type:'bar',data:{labels,datasets:[
@@ -1009,7 +1012,6 @@ function updateCharts(){
         plugins:{legend:{display:true,labels:{color:'#f8fafc',font:{size:10,weight:'bold'}}}},
         scales:{x:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.04)'}}}
     }});
-    // FIX A: skip doughnut render if all current-month values are 0
     if(charts.pie){charts.pie.destroy(); charts.pie=null; ctxPie.clearRect(0,0,ctxPie.canvas.width,ctxPie.canvas.height);}
     const pieNoData=document.getElementById('pieNoData');
     if(cI+cE+cF===0){
@@ -1038,6 +1040,7 @@ function exportToCSV(){
         showToast('הייצוא הושלם','var(--income)');
     }catch(e){handleError(e,'exportToCSV');}
 }
+
 function exportToJSON(){
     try{
         const blob=new Blob([JSON.stringify(entries,null,2)],{type:'application/json'});
@@ -1046,7 +1049,9 @@ function exportToJSON(){
         showToast('גיבוי נוצר בהצלחה','var(--income)');
     }catch(e){handleError(e,'exportToJSON');}
 }
+
 function triggerImportJSON(){ document.getElementById('importJsonFile').click(); }
+
 document.getElementById('importJsonFile').addEventListener('change',function(ev){
     const file=ev.target.files[0]; if(!file) return;
     const reader=new FileReader();
@@ -1095,7 +1100,7 @@ function showToast(msg,color){
 
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeConfirm();closeAllSheets();} });
 
-// FIX F: swipe left/right to change month on mobile
+// Swipe left/right to change month on mobile
 (function(){
     let touchStartX=0, touchStartY=0;
     document.addEventListener('touchstart',e=>{
@@ -1103,19 +1108,15 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeConfirm();clo
         touchStartY=e.changedTouches[0].clientY;
     },{passive:true});
     document.addEventListener('touchend',e=>{
-        // Don't trigger if sheet/overlay is open
         if(isFabOpen||isSettingsOpen) return;
         const dx=e.changedTouches[0].clientX-touchStartX;
         const dy=e.changedTouches[0].clientY-touchStartY;
-        // Only horizontal swipe (dx>50, dy small)
         if(Math.abs(dx)>55 && Math.abs(dy)<40){
-            // RTL: swipe right = prev month, swipe left = next month
             changeMonth(dx>0?-1:1);
         }
     },{passive:true});
 })();
 
-// FIX J: initialize date field to today on first load
 document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
 init();
 </script>
