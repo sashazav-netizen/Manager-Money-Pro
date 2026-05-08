@@ -49,7 +49,7 @@
         /* TOAST */
         .privacy-toast {
             position: fixed; top: 110px; left: 50%; transform: translateX(-50%) translateY(-10px);
-            background: rgba(15,23,42,0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(15,23,42,0.9); backdrop-filter: blur(10px);
             color: #fff; padding: 8px 20px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
             font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 8px;
             z-index: 5000; opacity: 0; pointer-events: none; transition: all 0.4s ease;
@@ -74,7 +74,7 @@
         .tool-btn:hover { color: var(--text); background: rgba(255,255,255,0.08); }
         .tool-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(14,165,233,0.1); }
 
-        /* OFFLINE BANNER — FIX: דחוף מסוכן 4 */
+        /* FIX 1: OFFLINE BANNER */
         .offline-banner {
             display: none; background: rgba(244,63,94,0.12); border: 1px solid rgba(244,63,94,0.3);
             border-radius: 12px; padding: 10px 16px; margin-bottom: 14px;
@@ -144,7 +144,7 @@
         .progress-container { background: var(--glass); padding: 20px; border-radius: var(--card-radius); border: 1px solid var(--glass-border); margin-bottom: 20px; }
         .progress-header { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 800; font-size: 0.9rem; }
         .bar-bg { background: rgba(255,255,255,0.06); height: 10px; border-radius: 10px; overflow: hidden; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--income), #34d399); width: 0%; transition: width 0.9s cubic-bezier(.4,0,.2,1), background 0.5s ease; border-radius: 10px; }
+        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--income), #34d399); width: 0%; transition: width 0.9s cubic-bezier(.4,0,.2,1); border-radius: 10px; }
         .bar-fill.danger { background: linear-gradient(90deg, var(--expense), #fb7185); }
 
         /* SECTION TITLE */
@@ -181,14 +181,14 @@
         .item.type-expense { border-right: 3px solid var(--expense); }
         .item.type-fixed   { border-right: 3px solid var(--fixed); }
         .item small.fixed-tag { background: var(--fixed); color: white; padding: 2px 7px; border-radius: 7px; font-size: 0.58rem; margin-right: 5px; font-weight: 900; }
-        /* FIX I5: trash-btn נגישות */
-        .trash-btn {
-            color: var(--expense); font-size: 1rem; cursor: pointer; opacity: 0.45;
-            margin-right: 12px; transition: opacity 0.2s, transform 0.2s; padding: 4px;
-            border-radius: 6px;
+        .item-category-badge {
+            background: rgba(255,255,255,0.08);
+            padding: 2px 6px; border-radius: 8px;
+            font-size: 0.6rem; color: var(--text-dim);
+            margin-top: 4px; display: inline-block;
         }
+        .trash-btn { color: var(--expense); font-size: 1rem; cursor: pointer; opacity: 0.45; margin-right: 12px; transition: opacity 0.2s, transform 0.2s; padding: 4px; }
         .trash-btn:hover { opacity: 1; transform: scale(1.15); }
-        .trash-btn:focus { outline: 2px solid var(--expense); outline-offset: 2px; opacity: 1; }
 
         /* FOOTER */
         .footer-copyright { text-align: center; font-size: 0.68rem; color: var(--text-dim); padding: 15px 0 100px 0; font-weight: 700; letter-spacing: 1px; opacity: 0.6; }
@@ -240,6 +240,7 @@
             white-space: nowrap; z-index: 1099;
         }
         .fab:not(.open):hover + .fab-tooltip { opacity: 1; }
+        .fab.open + .fab-tooltip { display: none; }
 
         /* OVERLAY & SHEETS */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; backdrop-filter: blur(5px); }
@@ -247,9 +248,8 @@
             position: fixed; bottom: -100%; left: 0; width: 100%; background: #0f172a;
             border-radius: 30px 30px 0 0; z-index: 2001; padding: 20px 20px 40px;
             transition: bottom 0.38s cubic-bezier(.4,0,.2,1);
-            overscroll-behavior: contain;
-            -webkit-overflow-scrolling: touch;
-            overflow-y: auto;
+            overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+            overflow-y: auto; max-height: 85vh;
         }
         .sheet.open { bottom: 0; }
         .sheet-handle { width: 40px; height: 4px; background: var(--glass-border); border-radius: 2px; margin: 0 auto 20px; }
@@ -263,9 +263,7 @@
         select {
             -webkit-appearance: none; -moz-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: left 14px center;
-            padding-left: 40px;
+            background-repeat: no-repeat; background-position: left 14px center; padding-left: 40px;
         }
         input:focus, select:focus { border-color: var(--accent); background: rgba(14,165,233,0.06); }
         input.error { border-color: var(--expense); background: rgba(244,63,94,0.1); }
@@ -287,7 +285,7 @@
         }
         .btn-cancel:hover { background: rgba(244,63,94,0.06); }
 
-        /* CONFIRM BOX */
+        /* CONFIRM BOXES */
         .confirm-box {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
             background: #1e293b; padding: 28px; border-radius: 24px; border: 1px solid var(--glass-border);
@@ -298,6 +296,9 @@
         @keyframes popIn { from { transform:translate(-50%,-50%) scale(0.92); opacity:0; } to { transform:translate(-50%,-50%) scale(1); opacity:1; } }
         .confirm-box h3 { margin: 0 0 10px; font-size: 1.1rem; }
         .confirm-box p  { color: var(--text-dim); margin-bottom: 22px; font-size: 0.9rem; line-height: 1.5; }
+        #confirmDeleteCategoryBox p { line-height: 1.6; }
+        #confirmDeleteCategoryBox strong { color: var(--expense); }
+        #confirmDeleteCategoryBox small { display: block; margin-top: 8px; }
 
         /* PAGES */
         .page { display: none; }
@@ -311,17 +312,43 @@
             display: flex; flex-direction: column; align-items: center; width: 100%;
         }
         .chart-box h3 { margin: 0 0 16px; font-size: 0.78rem; font-weight: 900; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; align-self: flex-start; }
-        .pie-container { max-width: 160px; width: 100%; margin: 0 auto; }
+        .pie-container { max-width: 200px; width: 100%; margin: 0 auto; }
+        canvas { max-height: 280px; width: 100%; }
 
-        /* SETTINGS */
-        .settings-btn {
+        /* SETTINGS & CATEGORIES */
+        .settings-btn, .category-item {
             width: 100%; padding: 16px; border-radius: 14px; background: rgba(255,255,255,0.04);
             border: 1px solid var(--glass-border); color: white; margin-bottom: 10px; text-align: right;
             display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
             transition: background 0.2s, transform 0.15s;
         }
-        .settings-btn:hover { background: rgba(255,255,255,0.07); transform: translateX(-2px); }
-        .settings-btn span { font-size: 1.2rem; }
+        .settings-btn:hover, .category-item:hover { background: rgba(255,255,255,0.07); transform: translateX(-2px); }
+        .settings-btn span, .category-item span { font-size: 1.2rem; }
+        .category-item { justify-content: space-between; cursor: default; }
+        .category-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .category-actions { display: flex; gap: 8px; }
+        .category-actions button {
+            background: none; border: none; color: var(--text-dim);
+            cursor: pointer; font-size: 1.1rem; padding: 8px 12px;
+            border-radius: 8px; transition: all 0.2s;
+        }
+        .category-actions button:hover { background: rgba(255,255,255,0.1); transform: scale(1.05); }
+        .category-actions .edit-cat:hover { color: var(--accent); }
+        .category-actions .delete-cat:hover { color: var(--expense); }
+        .add-category-btn {
+            background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3);
+            justify-content: center; gap: 8px; margin-top: 15px;
+        }
+        .add-category-btn span { font-size: 1rem; }
+
+        /* CATEGORY EDIT DIALOG */
+        #categoryEditSheet input { margin-bottom: 20px; text-align: right; }
+        .type-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
+        .type-btn { flex: 1; padding: 14px; border-radius: 12px; border: none; font-weight: 800; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .type-btn-income { background: rgba(16,185,129,0.4); color: var(--income); }
+        .type-btn-income.active { background: var(--income); color: white; box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
+        .type-btn-expense { background: rgba(244,63,94,0.4); color: var(--expense); }
+        .type-btn-expense.active { background: var(--expense); color: white; box-shadow: 0 4px 15px rgba(244,63,94,0.4); }
 
         /* ONBOARDING */
         #onboardingOverlay {
@@ -358,41 +385,37 @@
         #loadingBar {
             position: fixed; top: 0; left: 0; width: 100%; height: 3px; z-index: 9999;
             background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
-            background-size: 200% 100%;
-            animation: shimmer 1.2s infinite linear;
+            background-size: 200% 100%; animation: shimmer 1.2s infinite linear;
         }
         @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
         #loadingBar.hidden { display: none; }
 
         body.modal-open { overflow: hidden; position: fixed; width: 100%; }
 
+        @media (max-width: 480px) {
+            .pie-container { max-width: 180px; }
+            .chart-box canvas { max-height: 200px !important; }
+        }
         @media (max-width: 360px) {
             .brand h1 { font-size: 1.8rem; }
             .stat-card b { font-size: 1.1rem; }
             .nav-item label { font-size: 0.52rem; }
+            .pie-container { max-width: 150px; }
         }
     </style>
 </head>
 <body>
 
 <div id="loadingBar"></div>
+
 <div id="onboardingOverlay">
     <div class="onboard-logo">💎</div>
     <h1 class="onboard-title">Manager<span>Money</span> Pro</h1>
     <p class="onboard-sub">ניהול כספים חכם ופשוט<br>כל ההוצאות וההכנסות שלך במקום אחד</p>
     <div class="onboard-steps">
-        <div class="onboard-step">
-            <div class="onboard-step-icon green">💰</div>
-            <div class="onboard-step-text"><strong>הוסף הכנסות</strong><span>משכורת, פרילנס או כל הכנסה אחרת</span></div>
-        </div>
-        <div class="onboard-step">
-            <div class="onboard-step-icon red">💸</div>
-            <div class="onboard-step-text"><strong>עקוב אחרי הוצאות</strong><span>קניות, חשבונות, בילויים ועוד</span></div>
-        </div>
-        <div class="onboard-step">
-            <div class="onboard-step-icon purple">🔄</div>
-            <div class="onboard-step-text"><strong>הגדר תשלומים קבועים</strong><span>שכ"ד, ביטוחים — פעם אחת ונגמר</span></div>
-        </div>
+        <div class="onboard-step"><div class="onboard-step-icon green">💰</div><div class="onboard-step-text"><strong>הוסף הכנסות</strong><span>משכורת, פרילנס או כל הכנסה אחרת</span></div></div>
+        <div class="onboard-step"><div class="onboard-step-icon red">💸</div><div class="onboard-step-text"><strong>עקוב אחרי הוצאות</strong><span>קניות, חשבונות, בילויים ועוד</span></div></div>
+        <div class="onboard-step"><div class="onboard-step-icon purple">🔄</div><div class="onboard-step-text"><strong>הגדר תשלומים קבועים</strong><span>שכ"ד, ביטוחים — פעם אחת ונגמר</span></div></div>
     </div>
     <button class="onboard-cta" onclick="dismissOnboarding()">בואו נתחיל! ✨</button>
     <div class="onboard-skip" onclick="dismissOnboarding()">כבר מכיר, דלג</div>
@@ -411,6 +434,16 @@
     </div>
 </div>
 
+<!-- CONFIRM DELETE CATEGORY -->
+<div class="confirm-box" id="confirmDeleteCategoryBox">
+    <h3 id="deleteCategoryTitle">🗑️ מחיקת קטגוריה</h3>
+    <p id="deleteCategoryMsg"></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <button onclick="executeDeleteCategory()" id="confirmDeleteCatBtn" style="padding:14px;border-radius:12px;border:none;color:white;font-weight:800;cursor:pointer;background:var(--expense);">מחק</button>
+        <button onclick="closeDeleteCategoryConfirm()" style="padding:14px;border-radius:12px;border:none;background:rgba(255,255,255,0.1);color:white;font-weight:700;cursor:pointer;">ביטול</button>
+    </div>
+</div>
+
 <!-- ADD/EDIT SHEET -->
 <div class="sheet" id="sheet">
     <div class="sheet-handle"></div>
@@ -418,12 +451,13 @@
     <input type="text" id="fDesc" placeholder="תיאור הפעולה" maxlength="100">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <input type="number" id="fAmount" placeholder="סכום ₪" inputmode="decimal" step="0.01" min="0.01">
-        <select id="fType" onchange="toggleDateField()">
+        <select id="fType" onchange="toggleDateField(); updateCategorySelect()">
             <option value="expense" selected>💸 הוצאה</option>
             <option value="income">💰 הכנסה</option>
             <option value="fixed">🔄 קבועה</option>
         </select>
     </div>
+    <select id="fCategory"><option value="">-- ללא קטגוריה --</option></select>
     <input type="date" id="fDate">
     <button class="btn-main" onclick="validateAndAsk()">שמור</button>
     <button class="btn-cancel" onclick="toggleFab()">ביטול</button>
@@ -436,11 +470,35 @@
     <button class="settings-btn" onclick="exportToCSV()"><span>📊</span> ייצוא נתוני חודש לאקסל (CSV)</button>
     <button class="settings-btn" onclick="exportToJSON()"><span>💾</span> גיבוי מסד נתונים מלא (JSON)</button>
     <button class="settings-btn" onclick="triggerImportJSON()"><span>📂</span> שחזור מגיבוי (JSON)</button>
+    <button class="settings-btn" onclick="openCategoryManager()"><span>🏷️</span> ניהול קטגוריות</button>
     <input type="file" id="importJsonFile" accept=".json" style="display:none">
     <div style="text-align:center;margin-top:20px;padding:14px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid var(--glass-border);font-size:0.82rem;color:var(--text-dim);line-height:1.65;">
         <span id="settingsCloudText">בודק חיבור...</span>
     </div>
     <button class="btn-cancel" onclick="toggleSettings()">סגור</button>
+</div>
+
+<!-- CATEGORY MANAGER SHEET -->
+<div class="sheet" id="categorySheet">
+    <div class="sheet-handle"></div>
+    <h2 style="text-align:center;margin:0 0 22px;font-size:1.1rem;">🏷️ ניהול קטגוריות</h2>
+    <div id="categoriesList"></div>
+    <button class="settings-btn add-category-btn" onclick="showAddCategoryDialog()"><span>➕</span> הוסף קטגוריה חדשה</button>
+    <button class="btn-cancel" onclick="closeCategoryManager()">סגור</button>
+</div>
+
+<!-- CATEGORY EDIT SHEET -->
+<div class="sheet" id="categoryEditSheet">
+    <div class="sheet-handle"></div>
+    <h2 id="categoryDialogTitle" style="text-align:center;margin:0 0 22px;font-size:1.1rem;">הוסף קטגוריה</h2>
+    <input type="text" id="catName" placeholder="שם הקטגוריה" maxlength="30">
+    <div class="type-buttons">
+        <button id="catTypeIncomeBtn" class="type-btn type-btn-income" onclick="setCategoryType('income')">💰 הכנסה</button>
+        <button id="catTypeExpenseBtn" class="type-btn type-btn-expense active" onclick="setCategoryType('expense')">💸 הוצאה</button>
+    </div>
+    <input type="hidden" id="catType" value="expense">
+    <button class="btn-main" onclick="saveCategory()">שמור</button>
+    <button class="btn-cancel" onclick="closeCategoryEdit()">ביטול</button>
 </div>
 
 <!-- MAIN CONTAINER -->
@@ -451,22 +509,22 @@
             <h1>Manager<span class="accent">Money</span></h1>
         </div>
         <div class="header-tools">
-            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()" title="מצב פרטיות" aria-label="הפעל מצב פרטיות">👁️</button>
-            <button class="tool-btn" onclick="toggleSettings()" title="הגדרות" aria-label="פתח הגדרות">⚙️</button>
-            <div class="cloud-status" title="סטטוס חיבור">
+            <button class="tool-btn" id="eyeBtn" onclick="togglePrivacy()" title="מצב פרטיות">👁️</button>
+            <button class="tool-btn" onclick="toggleSettings()" title="הגדרות">⚙️</button>
+            <div class="cloud-status">
                 <div id="statusDot" class="status-dot"></div>
                 <span id="statusText">מתחבר...</span>
             </div>
         </div>
     </header>
 
-    <!-- FIX I4+Sug4: Offline banner -->
+    <!-- FIX 1: Offline banner -->
     <div class="offline-banner" id="offlineBanner">⚠️ אין חיבור לענן — הנתונים לא נשמרים. בדוק חיבור לאינטרנט.</div>
 
     <div class="top-date-nav">
-        <button class="nav-btn" onclick="changeMonth(-1)" title="חודש קודם" aria-label="חודש קודם">▸</button>
+        <button class="nav-btn" onclick="changeMonth(-1)" title="חודש קודם">▸</button>
         <b id="monthLabel"></b>
-        <button class="nav-btn" onclick="changeMonth(1)" title="חודש הבא" aria-label="חודש הבא">◂</button>
+        <button class="nav-btn" onclick="changeMonth(1)" title="חודש הבא">◂</button>
     </div>
 
     <!-- HOME -->
@@ -474,22 +532,14 @@
         <div class="main-stats">
             <div class="stat-card wide">
                 <div class="stat-half" style="border-left:1px solid var(--glass-border)">
-                    <label>יתרה נוכחית</label>
-                    <b id="bCurrent" class="money val-current">₪0</b>
+                    <label>יתרה נוכחית</label><b id="bCurrent" class="money val-current">₪0</b>
                 </div>
                 <div class="stat-half">
-                    <label>לאחר קבועות</label>
-                    <b id="bTotal" class="money val-final">₪0</b>
+                    <label>לאחר קבועות</label><b id="bTotal" class="money val-final">₪0</b>
                 </div>
             </div>
-            <div class="stat-card card-inc">
-                <label style="color:var(--income)">הכנסות ↗️</label>
-                <b id="bInc" class="money" style="color:var(--income)">₪0</b>
-            </div>
-            <div class="stat-card card-exp">
-                <label style="color:var(--expense)">הוצאות ↘️</label>
-                <b id="bExp" class="money" style="color:var(--expense)">₪0</b>
-            </div>
+            <div class="stat-card card-inc"><label style="color:var(--income)">הכנסות ↗️</label><b id="bInc" class="money" style="color:var(--income)">₪0</b></div>
+            <div class="stat-card card-exp"><label style="color:var(--expense)">הוצאות ↘️</label><b id="bExp" class="money" style="color:var(--expense)">₪0</b></div>
         </div>
         <div class="empty-state" id="homeEmpty">
             <div class="empty-icon">💡</div>
@@ -503,8 +553,7 @@
     <!-- INCOME -->
     <div id="page-income" class="page">
         <div class="empty-state" id="incomeEmpty">
-            <div class="empty-icon">💰</div>
-            <h3>אין הכנסות בחודש זה</h3>
+            <div class="empty-icon">💰</div><h3>אין הכנסות בחודש זה</h3>
             <p>הוסף את ההכנסות שלך כדי לעקוב אחרי התקציב</p>
             <button class="empty-cta" onclick="openSheetWithType('income')">+ הוסף הכנסה</button>
         </div>
@@ -514,8 +563,7 @@
     <!-- EXPENSE -->
     <div id="page-expense" class="page">
         <div class="empty-state" id="expenseEmpty">
-            <div class="empty-icon">💸</div>
-            <h3>אין הוצאות בחודש זה</h3>
+            <div class="empty-icon">💸</div><h3>אין הוצאות בחודש זה</h3>
             <p>כל ההוצאות שלך יופיעו כאן</p>
             <button class="empty-cta" onclick="openSheetWithType('expense')">+ הוסף הוצאה</button>
         </div>
@@ -525,8 +573,7 @@
     <!-- FIXED -->
     <div id="page-fixed" class="page">
         <div class="empty-state" id="fixedEmpty">
-            <div class="empty-icon">🔄</div>
-            <h3>אין תשלומים קבועים</h3>
+            <div class="empty-icon">🔄</div><h3>אין תשלומים קבועים</h3>
             <p>הגדר שכ"ד, ביטוחים וחשבונות חוזרים<br>פעם אחת, ולתמיד</p>
             <button class="empty-cta" onclick="openSheetWithType('fixed')">+ הוסף תשלום קבוע</button>
         </div>
@@ -555,6 +602,8 @@
         <div class="stat-row-new"><label>ממוצע חיסכון חודשי</label><b id="avg6Save" class="money" style="color:var(--accent)">₪0</b></div>
         <div class="stat-section-title">הוצאות גדולות החודש</div>
         <div id="topExpList"></div>
+        <div class="stat-section-title">הוצאות לפי קטגוריה</div>
+        <div id="categoryStatsList"></div>
         <div class="stat-section-title">פעילות החודש</div>
         <div class="stat-row-new"><label>מספר הכנסות</label><b id="actInc" style="color:var(--income)">0 פעולות</b></div>
         <div class="stat-row-new"><label>מספר הוצאות</label><b id="actExp" style="color:var(--expense)">0 פעולות</b></div>
@@ -570,26 +619,28 @@
         </div>
         <div id="chartsContent">
             <div class="chart-box"><h3>6 חודשים אחרונים</h3><canvas id="barChart"></canvas></div>
-            <div class="chart-box"><h3>חלוקה החודש</h3><div class="pie-container"><canvas id="pieChart"></canvas><p id="pieNoData" style="display:none;text-align:center;color:var(--text-dim);font-size:0.82rem;padding:20px 0;margin:0">אין נתונים לחודש הנוכחי</p></div></div>
+            <div class="chart-box"><h3>התפלגות הוצאות לפי קטגוריה</h3><div class="pie-container"><canvas id="categoryPieChart"></canvas><p id="categoryPieNoData" style="display:none;text-align:center;color:var(--text-dim);font-size:0.82rem;padding:20px 0;margin:0">אין הוצאות החודש להצגה</p></div></div>
+            <div class="chart-box"><h3>חלוקה הכנסות/הוצאות החודש</h3><div class="pie-container"><canvas id="pieChart"></canvas><p id="pieNoData" style="display:none;text-align:center;color:var(--text-dim);font-size:0.82rem;padding:20px 0;margin:0">אין נתונים לחודש הנוכחי</p></div></div>
         </div>
     </div>
 
     <div class="footer-copyright">© 2026 ALEXANDER-ZAVODISKER</div>
 </div>
 
-<nav class="bottom-nav" role="navigation" aria-label="ניווט ראשי">
-    <div class="nav-item active" data-page="home"    role="button" aria-label="בית"       onclick="showPage('home',this)"><span>🏠</span><label>בית</label></div>
-    <div class="nav-item"        data-page="income"  role="button" aria-label="הכנסות"    onclick="showPage('income',this)"><span>↗️</span><label>הכנסות</label></div>
-    <div class="nav-item"        data-page="expense" role="button" aria-label="הוצאות"    onclick="showPage('expense',this)"><span>↘️</span><label>הוצאות</label></div>
-    <div class="nav-item"        data-page="fixed"   role="button" aria-label="קבועות"    onclick="showPage('fixed',this)"><span>🔄</span><label>קבועות</label></div>
-    <div class="nav-item"        data-page="stats"   role="button" aria-label="סטטיסטיקה" onclick="showPage('stats',this)"><span>📊</span><label>סטטיסטיקה</label></div>
-    <div class="nav-item"        data-page="charts"  role="button" aria-label="גרפים"     onclick="showPage('charts',this)"><span>📈</span><label>גרפים</label></div>
+<nav class="bottom-nav">
+    <div class="nav-item active" data-page="home"    onclick="showPage('home',this)"><span>🏠</span><label>בית</label></div>
+    <div class="nav-item"        data-page="income"  onclick="showPage('income',this)"><span>↗️</span><label>הכנסות</label></div>
+    <div class="nav-item"        data-page="expense" onclick="showPage('expense',this)"><span>↘️</span><label>הוצאות</label></div>
+    <div class="nav-item"        data-page="fixed"   onclick="showPage('fixed',this)"><span>🔄</span><label>קבועות</label></div>
+    <div class="nav-item"        data-page="stats"   onclick="showPage('stats',this)"><span>📊</span><label>סטטיסטיקה</label></div>
+    <div class="nav-item"        data-page="charts"  onclick="showPage('charts',this)"><span>📈</span><label>גרפים</label></div>
 </nav>
 
 <button class="fab" id="mainFab" onclick="toggleFab()" aria-label="הוסף פעולה">+</button>
 <div class="fab-tooltip">הוסף פעולה</div>
 
 <script>
+// ========== Firebase Configuration ==========
 const firebaseConfig = {
     apiKey: "AIzaSyAZ2-EJjvIbDvtKLwKg3LObkIAs8sNhyjU",
     authDomain: "managermoney-49d0e.firebaseapp.com",
@@ -598,13 +649,92 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 
+// ========== Global Variables ==========
 const _saved = sessionStorage.getItem('mm_viewDate');
-let db, entries = [], viewDate = _saved ? new Date(_saved) : new Date();
-
-// ── FIX I2: שמור reference ל-listener למניעת כפילויות ──────────────────────
-let dbListener = null;
-
+let db = null;
+let currentUserId = null;
+let entries = [];
+let categories = [];
+let viewDate = _saved ? new Date(_saved) : new Date();
 let _savedScrollY = 0;
+
+// UI State
+let isPrivate = false;
+let pendingEditId = null;
+let pendingDeleteId = null;
+let isFabOpen = false;
+let isSettingsOpen = false;
+let isCategoryOpen = false;
+let isCategoryEditOpen = false;
+let pendingAction = null;
+let pendingSaveData = null;
+
+// Category management
+let pendingCategoryId = null;
+let pendingCategoryType = 'expense';
+let pendingDeleteCategoryId = null;
+
+// Charts cache
+let charts = {};
+let cache = { monthlyFixed: new Map(), lastCacheClear: Date.now() };
+
+// ========== DEFAULT CATEGORIES ==========
+const DEFAULT_CATEGORIES = [
+    { id: "cat_food",          name: "🍔 אוכל ושתייה",                type: "expense" },
+    { id: "cat_groceries",     name: "🛒 חנויות אוכל / פירות וירקות", type: "expense" },
+    { id: "cat_tobacco",       name: "🚬 טבק וגחלים לנרגילה",         type: "expense" },
+    { id: "cat_transport",     name: "🚗 תחבורה",                      type: "expense" },
+    { id: "cat_entertainment", name: "🎬 בילוי",                       type: "expense" },
+    { id: "cat_rent",          name: "🏠 שכירות",                      type: "expense" },
+    { id: "cat_fixed",         name: "📋 הוצאות קבועות",               type: "expense" },
+    { id: "cat_salary",        name: "💰 משכורת",                      type: "income"  },
+    { id: "cat_other",         name: "📦 אחר",                         type: "expense" }
+];
+
+// ========== Helper Functions ==========
+function safe(s) {
+    return String(s || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showToast(msg, color) {
+    const t = document.getElementById('privacyToast');
+    let icon = 'ℹ️';
+    if (msg.includes('נשמר'))                          icon = '✅';
+    if (msg.includes('נמחק'))                          icon = '🗑️';
+    if (msg.includes('פרטיות'))                        icon = '🔒';
+    if (msg.includes('רגילה'))                         icon = '👁️';
+    if (msg.includes('גיבוי') || msg.includes('ייצוא')) icon = '💾';
+    if (msg.includes('שוחזרו'))                        icon = '🔄';
+    if (msg.includes('קטגוריה'))                       icon = '🏷️';
+    document.getElementById('toastIcon').innerText = icon;
+    document.getElementById('toastText').innerText = msg;
+    const bg = { 'var(--income)':'rgba(16,185,129,0.2)', 'var(--expense)':'rgba(244,63,94,0.2)', 'var(--accent)':'rgba(14,165,233,0.2)' };
+    const bd = { 'var(--income)':'#10b981', 'var(--expense)':'#f43f5e', 'var(--accent)':'#0ea5e9' };
+    t.style.background = color ? (bg[color] || 'rgba(15,23,42,0.9)') : 'rgba(15,23,42,0.9)';
+    t.style.border = color ? `1px solid ${bd[color] || color}` : '1px solid rgba(255,255,255,0.1)';
+    t.classList.add('show');
+    clearTimeout(t._t);
+    t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function handleError(error, ctx) {
+    console.error(`[${ctx}]`, error);
+    let msg = 'אירעה שגיאה';
+    if (error.code === 'PERMISSION_DENIED') msg = 'אין הרשאה לביצוע פעולה זו';
+    else if (error.code === 'NETWORK_ERROR') msg = 'בעיית רשת, בדוק חיבור לאינטרנט';
+    else if (error.code === 'QUOTA_EXCEEDED') msg = 'חריגה ממכסת הנתונים';
+    else if (error.message) msg = `שגיאה: ${error.message}`;
+    showToast(msg, 'var(--expense)');
+    try {
+        const log = JSON.parse(localStorage.getItem('error_log') || '[]');
+        log.push({ timestamp: new Date().toISOString(), context: ctx, message: error.message || error });
+        while (log.length > 50) log.shift();
+        localStorage.setItem('error_log', JSON.stringify(log));
+    } catch (e) {}
+}
+
 function lockBodyScroll() {
     _savedScrollY = window.scrollY;
     document.body.style.top = `-${_savedScrollY}px`;
@@ -616,15 +746,19 @@ function unlockBodyScroll() {
     window.scrollTo(0, _savedScrollY);
 }
 
-let isPrivate = false;
-let pendingEditId = null, pendingDeleteId = null;
-let isFabOpen = false, isSettingsOpen = false;
-let pendingAction = null, pendingSaveData = null;
-let charts = {};
-// FIX I7: הסר cache time-based — מיותר לחלוטין
-let cache = { monthlyFixed: new Map() };
-
+// ========== Cache ==========
+function clearAllCache() {
+    cache.monthlyFixed.clear();
+    cache.lastCacheClear = Date.now();
+}
+function clearCacheIfNeeded() {
+    if (Date.now() - cache.lastCacheClear > 60000) {
+        cache.monthlyFixed.clear();
+        cache.lastCacheClear = Date.now();
+    }
+}
 function getMonthlyFixed(year, month) {
+    clearCacheIfNeeded();
     const key = `${year}-${month}`;
     if (cache.monthlyFixed.has(key)) return cache.monthlyFixed.get(key);
     let total = 0;
@@ -641,7 +775,7 @@ function getMonthlyFixed(year, month) {
     return total;
 }
 
-// ── FIX I11: פונקציה מרכזית לסינון entries לפי חודש — מחליפה 4 עותקים ──────
+// FIX 5: getEntriesForMonth helper — eliminates repeated filter logic
 function getEntriesForMonth(year, month) {
     return entries.filter(e => {
         if (!e.date || e.type === 'fixed') return false;
@@ -650,6 +784,182 @@ function getEntriesForMonth(year, month) {
     });
 }
 
+// ========== Category Management ==========
+function getCategoriesByType(type) {
+    return categories.filter(c => c.type === type || (type === 'fixed' && c.type === 'expense'));
+}
+function getCategoryName(catId) {
+    if (!catId) return 'ללא קטגוריה';
+    const cat = categories.find(c => c.id === catId);
+    return cat ? cat.name : 'ללא קטגוריה';
+}
+function updateCategorySelect() {
+    const type = document.getElementById('fType').value;
+    const select = document.getElementById('fCategory');
+    const currentVal = select.value;
+    const validCategories = getCategoriesByType(type);
+    select.innerHTML = '<option value="">-- ללא קטגוריה --</option>';
+    validCategories.forEach(cat => {
+        select.innerHTML += `<option value="${cat.id}">${safe(cat.name)}</option>`;
+    });
+    if (validCategories.some(c => c.id === currentVal)) select.value = currentVal;
+    else select.value = '';
+}
+function renderCategoriesList() {
+    const container = document.getElementById('categoriesList');
+    if (!categories.length) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:40px;">אין קטגוריות</p>';
+        return;
+    }
+    container.innerHTML = categories.map(cat => `
+        <div class="category-item">
+            <div class="category-info">
+                <span>${safe(cat.name)}</span>
+                <small style="color:var(--text-dim);font-size:0.7rem;">${cat.type === 'income' ? 'הכנסה' : 'הוצאה/קבועה'}</small>
+            </div>
+            <div class="category-actions">
+                <button class="edit-cat" onclick="editCategory('${cat.id}')" title="ערוך">✏️</button>
+                ${cat.id !== 'cat_other' ? `<button class="delete-cat" onclick="deleteCategory('${cat.id}')" title="מחק">🗑️</button>` : ''}
+            </div>
+        </div>`).join('');
+}
+function openCategoryDialog(catId = null) {
+    pendingCategoryId = catId;
+    isCategoryEditOpen = true;
+    const title = document.getElementById('categoryDialogTitle');
+    const nameInput = document.getElementById('catName');
+    if (catId) {
+        const cat = categories.find(c => c.id === catId); if (!cat) return;
+        title.innerText = 'ערוך קטגוריה';
+        nameInput.value = cat.name;
+        pendingCategoryType = cat.type;
+    } else {
+        title.innerText = 'הוסף קטגוריה חדשה';
+        nameInput.value = '';
+        pendingCategoryType = 'expense';
+    }
+    updateCategoryTypeButtons(pendingCategoryType);
+    document.getElementById('catType').value = pendingCategoryType;
+    document.getElementById('categoryEditSheet').classList.add('open');
+    document.getElementById('overlay').style.display = 'block';
+    lockBodyScroll();
+}
+function setCategoryType(type) {
+    pendingCategoryType = type;
+    document.getElementById('catType').value = type;
+    updateCategoryTypeButtons(type);
+}
+function updateCategoryTypeButtons(type) {
+    document.getElementById('catTypeIncomeBtn').classList.toggle('active', type === 'income');
+    document.getElementById('catTypeExpenseBtn').classList.toggle('active', type !== 'income');
+}
+function closeCategoryEdit() {
+    isCategoryEditOpen = false;
+    document.getElementById('categoryEditSheet').classList.remove('open');
+    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen || isCategoryOpen) ? 'block' : 'none';
+    if (!isFabOpen && !isSettingsOpen && !isCategoryOpen) unlockBodyScroll();
+    pendingCategoryId = null;
+    pendingCategoryType = 'expense';
+}
+function saveCategory() {
+    const catName = document.getElementById('catName').value.trim();
+    const catType = document.getElementById('catType').value;
+    if (!catName) { showToast('נא להזין שם קטגוריה', 'var(--expense)'); return; }
+    if (!currentUserId) { showToast('אין חיבור לענן', 'var(--expense)'); return; }
+    const categoriesRef = firebase.database().ref(`users/${currentUserId}/categories`);
+    const afterSave = () => {
+        closeCategoryEdit();
+        categoriesRef.once('value', snap => {
+            if (snap.val()) categories = Object.values(snap.val());
+            renderCategoriesList();
+            updateCategorySelect();
+            render();
+            if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
+        });
+    };
+    if (pendingCategoryId) {
+        categoriesRef.child(pendingCategoryId).update({ name: catName, type: catType })
+            .then(() => { showToast('קטגוריה עודכנה', 'var(--income)'); afterSave(); })
+            .catch(e => handleError(e, 'editCategory'));
+    } else {
+        const newId = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        categoriesRef.child(newId).set({ id: newId, name: catName, type: catType })
+            .then(() => { showToast('קטגוריה נוספה', 'var(--income)'); afterSave(); })
+            .catch(e => handleError(e, 'addCategory'));
+    }
+}
+function showAddCategoryDialog() { openCategoryDialog(); }
+function editCategory(catId) { openCategoryDialog(catId); }
+
+function showDeleteCategoryConfirm(catId, catName) {
+    pendingDeleteCategoryId = catId;
+    document.getElementById('deleteCategoryMsg').innerHTML = `למחוק את הקטגוריה "<strong>${safe(catName)}</strong>"?<br><small style="color:var(--text-dim);font-size:0.8rem;">פריטים עם קטגוריה זו יעברו ל"אחר".</small>`;
+    const box = document.getElementById('confirmDeleteCategoryBox');
+    box.style.display = 'block';
+    box.classList.remove('anim'); void box.offsetWidth; box.classList.add('anim');
+    document.getElementById('overlay').style.zIndex = '2500';
+    document.getElementById('overlay').style.display = 'block';
+    lockBodyScroll();
+}
+function closeDeleteCategoryConfirm() {
+    pendingDeleteCategoryId = null;
+    document.getElementById('confirmDeleteCategoryBox').style.display = 'none';
+    document.getElementById('overlay').style.zIndex = '2000';
+    if (!isFabOpen && !isSettingsOpen && !isCategoryOpen && !isCategoryEditOpen) {
+        document.getElementById('overlay').style.display = 'none';
+        unlockBodyScroll();
+    }
+}
+function executeDeleteCategory() {
+    const catId = pendingDeleteCategoryId;
+    if (!catId || !currentUserId) { closeDeleteCategoryConfirm(); return; }
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) { closeDeleteCategoryConfirm(); return; }
+    // Atomic batch: delete category + move all entries to cat_other
+    const updates = {};
+    entries.filter(e => e.category === catId).forEach(e => {
+        updates[`users/${currentUserId}/data/${e.id}/category`] = 'cat_other';
+    });
+    updates[`users/${currentUserId}/categories/${catId}`] = null;
+    firebase.database().ref().update(updates)
+        .then(() => {
+            showToast('קטגוריה נמחקה', 'var(--income)');
+            closeDeleteCategoryConfirm();
+            clearAllCache();
+            firebase.database().ref(`users/${currentUserId}/categories`).once('value', snap => {
+                if (snap.val()) categories = Object.values(snap.val());
+                renderCategoriesList();
+                updateCategorySelect();
+                render();
+                if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
+            });
+        })
+        .catch(e => handleError(e, 'deleteCategory'));
+}
+function deleteCategory(catId) {
+    const cat = categories.find(c => c.id === catId); if (!cat) return;
+    if (cat.id === 'cat_other') { showToast('לא ניתן למחוק את קטגוריית "אחר"', 'var(--expense)'); return; }
+    showDeleteCategoryConfirm(catId, cat.name);
+}
+function openCategoryManager() {
+    isCategoryOpen = true;
+    renderCategoriesList();
+    document.getElementById('categorySheet').classList.add('open');
+    document.getElementById('overlay').style.display = 'block';
+    lockBodyScroll();
+    if (isSettingsOpen) toggleSettings();
+}
+function closeCategoryManager() {
+    isCategoryOpen = false;
+    document.getElementById('categorySheet').classList.remove('open');
+    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen || isCategoryEditOpen) ? 'block' : 'none';
+    if (!isFabOpen && !isSettingsOpen && !isCategoryEditOpen) unlockBodyScroll();
+    updateCategorySelect();
+    render();
+    if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
+}
+
+// ========== Onboarding ==========
 function dismissOnboarding() {
     const el = document.getElementById('onboardingOverlay');
     if (!el) return;
@@ -664,9 +974,10 @@ function checkOnboarding() {
     }
 }
 
+// ========== Validation ==========
 function validateAmount(v) {
-    if (isNaN(v) || v <= 0)    { showToast('סכום חייב להיות מספר חיובי', 'var(--expense)'); return false; }
-    if (v > 999999999)         { showToast('סכום גדול מדי', 'var(--expense)'); return false; }
+    if (isNaN(v) || v <= 0) { showToast('סכום חייב להיות מספר חיובי', 'var(--expense)'); return false; }
+    if (v > 999999999)      { showToast('סכום גדול מדי', 'var(--expense)'); return false; }
     return true;
 }
 function validateDescription(d) {
@@ -684,76 +995,7 @@ function validateDate(s, type) {
     return true;
 }
 
-function handleError(error, ctx) {
-    console.error(`[${ctx}]`, error);
-    let msg = 'אירעה שגיאה';
-    if (error.code === 'PERMISSION_DENIED') msg = 'אין הרשאה לביצוע פעולה זו';
-    else if (error.code === 'NETWORK_ERROR') msg = 'בעיית רשת, בדוק חיבור לאינטרנט';
-    else if (error.code === 'QUOTA_EXCEEDED') msg = 'חריגה ממכסת הנתונים';
-    else if (error.message) msg = `שגיאה: ${error.message}`;
-    showToast(msg, 'var(--expense)');
-    try {
-        const log = JSON.parse(localStorage.getItem('error_log') || '[]');
-        log.push({ timestamp: new Date().toISOString(), context: ctx, message: error.message || error });
-        while (log.length > 50) log.shift();
-        localStorage.setItem('error_log', JSON.stringify(log));
-    } catch(e) {}
-}
-
-function init() {
-    checkOnboarding();
-    firebase.auth().signInAnonymously().then(user => {
-        db = firebase.database().ref(`users/${user.user.uid}/data`);
-        document.getElementById('statusDot').className = 'status-dot online';
-        document.getElementById('statusText').innerText = 'מחובר ✓';
-        document.getElementById('settingsCloudText').innerHTML = '☁️ סנכרון ענן פעיל — הנתונים נשמרים אוטומטית ב-Firebase';
-        document.getElementById('offlineBanner').classList.remove('show');
-
-        // ── FIX I2: נתק listener קודם לפני רישום חדש ──────────────────────
-        function attachDBListener() {
-            if (dbListener) db.off('value', dbListener);
-            dbListener = db.on('value', snap => {
-                try {
-                    entries = snap.val() ? Object.values(snap.val()) : [];
-                    document.getElementById('loadingBar').classList.add('hidden');
-                    cache.monthlyFixed.clear(); // נקה cache בכל שינוי נתונים
-                    render();
-                    if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
-                } catch(err) { handleError(err, 'db.onValue'); }
-            }, err => handleError(err, 'db.subscription'));
-        }
-        attachDBListener();
-
-    }).catch(error => {
-        handleError(error, 'firebase.auth');
-        document.getElementById('loadingBar').classList.add('hidden');
-        document.getElementById('statusText').innerText = 'לא מקוון';
-        document.getElementById('statusDot').style.background = 'var(--text-dim)';
-        document.getElementById('settingsCloudText').innerHTML = '⚠️ אין חיבור לענן — הנתונים לא יישמרו.';
-        // FIX Sug4: הצג banner בולט
-        document.getElementById('offlineBanner').classList.add('show');
-        render();
-    });
-}
-
-function validateAndAsk() {
-    const descEl = document.getElementById('fDesc'), amountEl = document.getElementById('fAmount');
-    const type = document.getElementById('fType').value, date = document.getElementById('fDate').value;
-    [descEl, amountEl].forEach(el => el.classList.remove('error'));
-    const desc = descEl.value, amount = parseFloat(amountEl.value);
-    if (!validateDescription(desc))  { descEl.classList.add('error'); return; }
-    if (!validateAmount(amount))     { amountEl.classList.add('error'); return; }
-    if (!validateDate(date, type))   { return; }
-    pendingSaveData = {
-        id: pendingEditId || Date.now().toString(),
-        desc: desc.trim(),
-        amount: Math.round(amount * 100) / 100,
-        type,
-        date: type === 'fixed' ? '' : (date || new Date().toISOString().split('T')[0])
-    };
-    askSaveConfirm();
-}
-
+// ========== Sheet Management ==========
 function toggleDateField() {
     document.getElementById('fDate').style.display = document.getElementById('fType').value === 'fixed' ? 'none' : 'block';
 }
@@ -766,6 +1008,7 @@ function resetForm() {
     document.getElementById('fAmount').classList.remove('error');
     document.getElementById('modalTitle').innerText = 'פעולה חדשה';
     toggleDateField();
+    updateCategorySelect();
 }
 function openEdit(id) {
     const e = entries.find(x => x.id === id); if (!e) return;
@@ -781,6 +1024,11 @@ function openEdit(id) {
     document.getElementById('fType').value = e.type;
     document.getElementById('fDate').value = (e.type === 'fixed' && !e.date) ? '' : (e.date || new Date().toISOString().split('T')[0]);
     toggleDateField();
+    updateCategorySelect();
+    if (e.category) {
+        const catSelect = document.getElementById('fCategory');
+        if (Array.from(catSelect.options).some(opt => opt.value === e.category)) catSelect.value = e.category;
+    }
     document.getElementById('modalTitle').innerText = 'עריכת פעולה';
     toggleFab();
 }
@@ -788,92 +1036,111 @@ function openSheetWithType(type) {
     resetForm();
     document.getElementById('fType').value = type;
     toggleDateField();
+    updateCategorySelect();
     if (!isFabOpen) toggleFab();
 }
 
-function askSaveConfirm() { pendingAction = 'save'; showConfirm("שמירה", "לעדכן את הנתונים לענן?", "var(--accent)"); }
-function askDeleteConfirm(id) {
-    pendingDeleteId = id; pendingAction = 'delete';
-    const e = entries.find(x => x.id === id);
-    showConfirm("מחיקה", `למחוק את "${safe(e ? e.desc : 'פעולה זו')}"?`, "var(--expense)");
-}
+// ========== Confirm Dialogs ==========
 function showConfirm(title, msg, color) {
     document.getElementById('confirmTitle').innerText = title;
     document.getElementById('confirmMsg').innerText = msg;
     document.getElementById('confirmExecBtn').style.background = color;
     const box = document.getElementById('confirmBox');
     box.style.display = 'block';
-    box.classList.remove('anim');
-    void box.offsetWidth;
-    box.classList.add('anim');
+    box.classList.remove('anim'); void box.offsetWidth; box.classList.add('anim');
     document.getElementById('overlay').style.zIndex = '2500';
     document.getElementById('overlay').style.display = 'block';
 }
-
-// ── FIX I6: closeConfirm עובר לתוך .then() — אין יותר race condition ───────
-function executeConfirmed() {
-    if (pendingAction === 'import') {
-        closeConfirm();
-        doImport();
-        return;
+function closeConfirm() {
+    document.getElementById('confirmBox').style.display = 'none';
+    document.getElementById('overlay').style.zIndex = '2000';
+    if (!isFabOpen && !isSettingsOpen && !isCategoryOpen && !isCategoryEditOpen) {
+        document.getElementById('overlay').style.display = 'none';
+        unlockBodyScroll();
     }
+}
+function askSaveConfirm()   { pendingAction = 'save';   showConfirm("שמירה", "לעדכן את הנתונים לענן?", "var(--accent)"); }
+function askDeleteConfirm(id) {
+    pendingDeleteId = id; pendingAction = 'delete';
+    const e = entries.find(x => x.id === id);
+    showConfirm("מחיקה", `למחוק את "${safe(e ? e.desc : 'פעולה זו')}"?`, "var(--expense)");
+}
+function validateAndAsk() {
+    const descEl = document.getElementById('fDesc'), amountEl = document.getElementById('fAmount');
+    const type = document.getElementById('fType').value, date = document.getElementById('fDate').value;
+    const category = document.getElementById('fCategory').value;
+    [descEl, amountEl].forEach(el => el.classList.remove('error'));
+    const desc = descEl.value, amount = parseFloat(amountEl.value);
+    if (!validateDescription(desc)) { descEl.classList.add('error'); return; }
+    if (!validateAmount(amount))    { amountEl.classList.add('error'); return; }
+    if (!validateDate(date, type))  { return; }
+    pendingSaveData = {
+        id: pendingEditId || Date.now().toString(),
+        desc: desc.trim(), amount: Math.round(amount * 100) / 100,
+        type, date: type === 'fixed' ? '' : (date || new Date().toISOString().split('T')[0]),
+        category: category || ''
+    };
+    askSaveConfirm();
+}
+
+// FIX 3: closeConfirm moved INSIDE .then()/.catch() — eliminates race condition
+function executeConfirmed() {
     if (!db) { showToast('אין חיבור לענן', 'var(--expense)'); closeConfirm(); return; }
     const btn = document.getElementById('confirmExecBtn');
     btn.disabled = true; btn.style.opacity = '0.5';
 
     if (pendingAction === 'save') {
-        if (!pendingSaveData) { closeConfirm(); return; }
+        if (!pendingSaveData) { closeConfirm(); btn.disabled=false; btn.style.opacity='1'; return; }
         const dataToSave = pendingSaveData;
-        pendingSaveData = null;
-        pendingEditId   = null;
+        pendingSaveData = null; pendingEditId = null;
         db.child(dataToSave.id).set(dataToSave)
-          .then(() => {
-              showToast('נשמר', 'var(--income)');
-              cache.monthlyFixed.clear();
-              closeConfirm();        // ← FIX I6: כאן, לא לפני
-              if (isFabOpen) toggleFab();
-          })
-          .catch(e => { handleError(e, 'save'); closeConfirm(); })
-          .finally(() => { btn.disabled = false; btn.style.opacity = '1'; });
+            .then(() => {
+                showToast('נשמר', 'var(--income)');
+                clearAllCache();
+                closeConfirm(); // ← FIX 3: inside .then()
+                if (isFabOpen) toggleFab();
+            })
+            .catch(e => { handleError(e, 'save'); closeConfirm(); })
+            .finally(() => { btn.disabled = false; btn.style.opacity = '1'; });
 
     } else if (pendingAction === 'delete') {
         const idToDelete = pendingDeleteId;
         pendingDeleteId = null;
         db.child(idToDelete).remove()
-          .then(() => {
-              showToast('נמחק', null);
-              cache.monthlyFixed.clear();
-              closeConfirm();        // ← FIX I6: כאן, לא לפני
-          })
-          .catch(e => { handleError(e, 'delete'); closeConfirm(); })
-          .finally(() => { btn.disabled = false; btn.style.opacity = '1'; });
+            .then(() => {
+                showToast('נמחק', null);
+                clearAllCache();
+                closeConfirm(); // ← FIX 3: inside .then()
+            })
+            .catch(e => { handleError(e, 'delete'); closeConfirm(); })
+            .finally(() => { btn.disabled = false; btn.style.opacity = '1'; });
     }
 }
 
-function closeConfirm() {
-    document.getElementById('confirmBox').style.display = 'none';
-    document.getElementById('overlay').style.zIndex = '2000';
-    if (!isFabOpen && !isSettingsOpen) {
-        document.getElementById('overlay').style.display = 'none';
-        unlockBodyScroll();
-    }
-}
-
+// ========== UI Toggles ==========
 function toggleFab() {
     isFabOpen = !isFabOpen;
     document.getElementById('mainFab').classList.toggle('open');
     document.getElementById('sheet').classList.toggle('open');
-    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
-    if (isFabOpen || isSettingsOpen) lockBodyScroll(); else unlockBodyScroll();
+    const anyOpen = isFabOpen || isSettingsOpen || isCategoryOpen || isCategoryEditOpen;
+    document.getElementById('overlay').style.display = anyOpen ? 'block' : 'none';
+    if (anyOpen) lockBodyScroll(); else unlockBodyScroll();
     if (!isFabOpen) { pendingEditId = null; resetForm(); }
 }
 function toggleSettings() {
     isSettingsOpen = !isSettingsOpen;
     document.getElementById('settingsSheet').classList.toggle('open');
-    document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen) ? 'block' : 'none';
-    if (isFabOpen || isSettingsOpen) lockBodyScroll(); else unlockBodyScroll();
+    const anyOpen = isFabOpen || isSettingsOpen || isCategoryOpen || isCategoryEditOpen;
+    document.getElementById('overlay').style.display = anyOpen ? 'block' : 'none';
+    if (anyOpen) lockBodyScroll(); else unlockBodyScroll();
 }
-function closeAllSheets() { if (isFabOpen) toggleFab(); if (isSettingsOpen) toggleSettings(); }
+function closeAllSheets() {
+    if (isFabOpen) toggleFab();
+    if (isSettingsOpen) toggleSettings();
+    if (isCategoryOpen) closeCategoryManager();
+    if (isCategoryEditOpen) closeCategoryEdit();
+    if (document.getElementById('confirmDeleteCategoryBox').style.display === 'block') closeDeleteCategoryConfirm();
+}
 function togglePrivacy() {
     isPrivate = !isPrivate;
     document.getElementById('eyeBtn').classList.toggle('active');
@@ -893,36 +1160,59 @@ function showPage(p, el) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (p === 'charts') updateCharts();
 }
-
-// ── FIX I3: השוואת שנה/חודש בלי timezone issues ────────────────────────────
 function changeMonth(n) {
     const next = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
-    const nowY = new Date().getFullYear(), nowM = new Date().getMonth();
-    if (next.getFullYear() > nowY || (next.getFullYear() === nowY && next.getMonth() > nowM)) return;
+    const now = new Date(); now.setDate(1); now.setHours(0, 0, 0, 0);
+    if (next > now) return;
     viewDate = next;
     sessionStorage.setItem('mm_viewDate', viewDate.toISOString());
     render();
     if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
 
-function safe(s) {
-    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+// ========== Render ==========
+function renderList(id, data, emptyId) {
+    const el = document.getElementById(id); if (!el) return;
+    const empty = emptyId ? document.getElementById(emptyId) : null;
+    if (!data.length) { el.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+    if (empty) empty.style.display = 'none';
+    el.innerHTML = data.sort((a, b) => {
+        if (a.type === 'fixed' && !a.date) return -1;
+        if (b.type === 'fixed' && !b.date) return 1;
+        return new Date(b.date || 0) - new Date(a.date || 0);
+    }).map(e => {
+        const st = ['income','expense','fixed'].includes(e.type) ? e.type : 'text-dim';
+        const typeClass = e.type==='income'?'type-income':e.type==='expense'?'type-expense':e.type==='fixed'?'type-fixed':'';
+        const categoryName = e.category ? getCategoryName(e.category) : 'ללא קטגוריה';
+        return `<div class="item ${typeClass}">
+            <div onclick="openEdit('${e.id}')" style="flex:1;cursor:pointer;min-width:0;">
+                ${e.type==='fixed'?'<small class="fixed-tag">קבוע</small>':''}
+                <b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${safe(e.desc)}</b>
+                <small style="color:var(--text-dim)">${e.date||'—'}</small>
+                <div class="item-category-badge">${safe(categoryName)}</div>
+            </div>
+            <div style="display:flex;align-items:center;flex-shrink:0;margin-right:8px;">
+                <b class="money" style="color:var(--${st});white-space:nowrap;">₪${e.amount.toLocaleString()}</b>
+                <span class="trash-btn" onclick="event.stopPropagation();askDeleteConfirm('${e.id}')">🗑️</span>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 function render() {
     const m = viewDate.getMonth(), y = viewDate.getFullYear();
-    document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL', { month: 'long', year: 'numeric' }).format(viewDate);
+    document.getElementById('monthLabel').innerText = new Intl.DateTimeFormat('he-IL',{month:'long',year:'numeric'}).format(viewDate);
 
-    // FIX I11: שימוש ב-getEntriesForMonth במקום filter ידני
+    // FIX 5: use getEntriesForMonth helper
     const mE = getEntriesForMonth(y, m);
     const mF = getMonthlyFixed(y, m);
 
     let inc = 0, exp = 0;
-    mE.forEach(e => { if (e.type === 'income') inc += e.amount; else if (e.type === 'expense') exp += e.amount; });
+    mE.forEach(e => { if (e.type==='income') inc+=e.amount; else if (e.type==='expense') exp+=e.amount; });
 
     document.getElementById('bInc').innerText = `₪${inc.toLocaleString()}`;
     document.getElementById('bExp').innerText = `₪${exp.toLocaleString()}`;
-    const cur = inc - exp, tot = inc - exp - mF;
+    const cur = inc-exp, tot = inc-exp-mF;
     document.getElementById('bCurrent').innerText = `₪${cur.toLocaleString()}`;
     document.getElementById('bCurrent').style.color = cur < 0 ? 'var(--expense)' : '';
     document.getElementById('bTotal').innerText = `₪${tot.toLocaleString()}`;
@@ -934,276 +1224,281 @@ function render() {
     document.getElementById('sBalance').innerText = `₪${balance.toLocaleString()}`;
     document.getElementById('sBalance').style.color = balance < 0 ? 'var(--expense)' : 'var(--accent)';
 
-    const savePerc = inc > 0 ? Math.max(0, Math.round((balance / inc) * 100)) : 0;
+    const savePerc = inc > 0 ? Math.max(0, Math.round((balance/inc)*100)) : 0;
     const usePerc  = 100 - savePerc;
     document.getElementById('sSavePerc').innerText = `${savePerc}%`;
-    document.getElementById('sSavePerc').style.color = savePerc > 0 ? 'var(--income)' : savePerc === 0 && inc === 0 ? 'var(--text-dim)' : 'var(--expense)';
+    document.getElementById('sSavePerc').style.color = savePerc > 0 ? 'var(--income)' : (savePerc===0&&inc===0 ? 'var(--text-dim)' : 'var(--expense)');
     document.getElementById('sUsePerc').innerText = `${usePerc}%`;
     document.getElementById('sUsePerc').style.color = usePerc >= 80 ? 'var(--expense)' : 'var(--accent)';
     const bar = document.getElementById('sBar');
     bar.style.width = `${Math.min(usePerc, 100)}%`;
     bar.className = 'bar-fill' + (usePerc >= 80 ? ' danger' : '');
 
-    // השוואה לחודש קודם — FIX I11
-    const prev  = new Date(y, m - 1, 1);
-    const pE    = getEntriesForMonth(prev.getFullYear(), prev.getMonth());
-    const pF    = getMonthlyFixed(prev.getFullYear(), prev.getMonth());
-    const pInc  = pE.filter(e => e.type === 'income').reduce((a, b) => a + b.amount, 0);
-    const pExp  = pE.filter(e => e.type === 'expense').reduce((a, b) => a + b.amount, 0) + pF;
-    document.getElementById('compInc').innerText  = `₪${pInc.toLocaleString()}`;
+    // Previous month — FIX 5: use getEntriesForMonth
+    const prev = new Date(y, m-1, 1);
+    const pE = getEntriesForMonth(prev.getFullYear(), prev.getMonth());
+    const pF = getMonthlyFixed(prev.getFullYear(), prev.getMonth());
+    const pInc = pE.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0);
+    const pExp = pE.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0) + pF;
+    document.getElementById('compInc').innerText = `₪${pInc.toLocaleString()}`;
     document.getElementById('compInc').style.color = 'var(--income)';
-    document.getElementById('compExp').innerText  = `₪${pExp.toLocaleString()}`;
+    document.getElementById('compExp').innerText = `₪${pExp.toLocaleString()}`;
     document.getElementById('compExp').style.color = 'var(--expense)';
     const pBal = pInc - pExp, diff = balance - pBal;
-    document.getElementById('compDiff').innerText = `${diff >= 0 ? '+' : ''}₪${diff.toLocaleString()}`;
+    document.getElementById('compDiff').innerText = `${diff>=0?'+':''}₪${diff.toLocaleString()}`;
     document.getElementById('compDiff').style.color = diff >= 0 ? 'var(--income)' : 'var(--expense)';
 
-    // ממוצע 6 חודשים — FIX I11
-    let s6i = 0, s6e = 0, m6 = 0;
-    for (let i = 1; i <= 6; i++) {
-        const d6 = new Date(y, m - i, 1);
+    // 6-month average — FIX 5: use getEntriesForMonth
+    let s6i=0, s6e=0, m6=0;
+    for (let i=1; i<=6; i++) {
+        const d6 = new Date(y, m-i, 1);
         const me = getEntriesForMonth(d6.getFullYear(), d6.getMonth());
         const f6 = getMonthlyFixed(d6.getFullYear(), d6.getMonth());
-        const i6 = me.filter(e => e.type === 'income').reduce((a, b) => a + b.amount, 0);
-        const e6 = me.filter(e => e.type === 'expense').reduce((a, b) => a + b.amount, 0) + f6;
-        if (i6 > 0 || e6 > 0) { s6i += i6; s6e += e6; m6++; }
+        const i6 = me.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0);
+        const e6 = me.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0) + f6;
+        if (i6 > 0 || e6 > 0) { s6i+=i6; s6e+=e6; m6++; }
     }
-    const a6i = m6 > 0 ? Math.round(s6i / m6) : 0;
-    const a6e = m6 > 0 ? Math.round(s6e / m6) : 0;
-    const a6s = a6i - a6e;
+    const a6i=m6>0?Math.round(s6i/m6):0, a6e=m6>0?Math.round(s6e/m6):0, a6s=a6i-a6e;
     document.getElementById('avg6Inc').innerText  = `₪${a6i.toLocaleString()}`;
     document.getElementById('avg6Exp').innerText  = `₪${a6e.toLocaleString()}`;
     document.getElementById('avg6Save').innerText = `₪${a6s.toLocaleString()}`;
     document.getElementById('avg6Save').style.color = a6s >= 0 ? 'var(--accent)' : 'var(--expense)';
 
-    // Top 3 הוצאות
-    const top3 = mE.filter(e => e.type === 'expense').sort((a, b) => b.amount - a.amount).slice(0, 3);
-    document.getElementById('topExpList').innerHTML = top3.length === 0
+    // Top 3 expenses
+    const top3 = mE.filter(e=>e.type==='expense').sort((a,b)=>b.amount-a.amount).slice(0,3);
+    document.getElementById('topExpList').innerHTML = top3.length===0
         ? '<p style="text-align:center;color:var(--text-dim);padding:10px 0;font-size:0.85rem">אין הוצאות החודש</p>'
-        : top3.map((e, i) => {
-            const p = exp > 0 ? Math.round((e.amount / exp) * 100) : 0;
+        : top3.map((e,i) => {
+            const p = exp>0 ? Math.round((e.amount/exp)*100) : 0;
             return `<div class="stat-row-new" style="flex-direction:column;align-items:flex-end;gap:4px;">
                 <div style="display:flex;justify-content:space-between;width:100%;align-items:center;">
                     <b class="money" style="color:var(--expense)">₪${e.amount.toLocaleString()} <span style="color:var(--text-dim);font-size:0.72rem;font-weight:400">(${p}% מהוצאות)</span></b>
-                    <label style="font-weight:700">${i + 1}. ${safe(e.desc)}</label>
+                    <label style="font-weight:700">${i+1}. ${safe(e.desc)}</label>
                 </div>
             </div>`;
         }).join('');
 
-    const cI = mE.filter(e => e.type === 'income').length;
-    const cE = mE.filter(e => e.type === 'expense').length;
+    // Category stats
+    const categoryMap = new Map();
+    mE.filter(e=>e.type==='expense').forEach(e => {
+        const catId = e.category || 'cat_other';
+        categoryMap.set(catId, (categoryMap.get(catId)||0) + e.amount);
+    });
+    const categoryStats = Array.from(categoryMap.entries())
+        .map(([catId, amount]) => ({ catId, amount, name: getCategoryName(catId) }))
+        .sort((a,b) => b.amount-a.amount);
+    document.getElementById('categoryStatsList').innerHTML = categoryStats.length===0
+        ? '<p style="text-align:center;color:var(--text-dim);padding:10px 0;font-size:0.85rem">אין הוצאות לפי קטגוריה</p>'
+        : categoryStats.map(cs => `<div class="stat-row-new"><label>${safe(cs.name)}</label><b class="money" style="color:var(--expense)">₪${cs.amount.toLocaleString()}</b></div>`).join('');
+
+    const cI = mE.filter(e=>e.type==='income').length, cE = mE.filter(e=>e.type==='expense').length;
     document.getElementById('actInc').innerText   = `${cI} פעולות`;
     document.getElementById('actExp').innerText   = `${cE} פעולות`;
-    document.getElementById('actTotal').innerText = `${cI + cE} פעולות`;
+    document.getElementById('actTotal').innerText = `${cI+cE} פעולות`;
 
-    // ── FIX I4: fixed entries מסוננים לחודש הנוכחי לעקביות עם getMonthlyFixed ──
-    const fE = entries.filter(e => {
-        if (e.type !== 'fixed') return false;
-        if (!e.date) return true; // קבוע ללא תאריך — תמיד מוצג
-        const d = new Date(e.date);
-        return !isNaN(d.getTime()) && d.getMonth() === m && d.getFullYear() === y;
-    });
-
-    const homeAll = [...mE, ...fE];
-    renderList('list-home',    homeAll,                           'homeEmpty');
-    renderList('list-income',  mE.filter(e => e.type === 'income'),  'incomeEmpty');
-    renderList('list-expense', mE.filter(e => e.type === 'expense'), 'expenseEmpty');
-    renderList('list-fixed',   fE,                                    'fixedEmpty');
+    const fE = entries.filter(e => e.type === 'fixed');
+    renderList('list-home',    [...mE,...fE],                          'homeEmpty');
+    renderList('list-income',  mE.filter(e=>e.type==='income'),        'incomeEmpty');
+    renderList('list-expense', mE.filter(e=>e.type==='expense'),       'expenseEmpty');
+    renderList('list-fixed',   fE,                                      'fixedEmpty');
     applyPrivacyUI();
 }
 
-function renderList(id, data, emptyId) {
-    const el = document.getElementById(id); if (!el) return;
-    const empty = emptyId ? document.getElementById(emptyId) : null;
-    if (!data.length) { el.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
-    if (empty) empty.style.display = 'none';
-
-    el.innerHTML = data.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).map(e => {
-        const st = ['income','expense','fixed'].includes(e.type) ? e.type : 'text-dim';
-        const typeClass = e.type === 'income' ? 'type-income' : e.type === 'expense' ? 'type-expense' : e.type === 'fixed' ? 'type-fixed' : '';
-        // ── FIX I1: שימוש ב-data-id במקום inline onclick עם ID גולמי ──────────
-        // ── FIX I5: role="button" + tabindex + onkeydown על trash ───────────
-        return `<div class="item ${typeClass}">
-            <div class="item-main" data-id="${safe(e.id)}" style="flex:1;cursor:pointer;min-width:0;">
-                ${e.type === 'fixed' ? '<small class="fixed-tag">קבוע</small>' : ''}
-                <b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${safe(e.desc)}</b>
-                <small style="color:var(--text-dim)">${e.date || '—'}</small>
-            </div>
-            <div style="display:flex;align-items:center;flex-shrink:0;margin-right:8px;">
-                <b class="money" style="color:var(--${st});white-space:nowrap;">₪${e.amount.toLocaleString()}</b>
-                <span class="trash-btn" role="button" tabindex="0"
-                    data-del="${safe(e.id)}"
-                    aria-label="מחק ${safe(e.desc)}"
-                    onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();askDeleteConfirm(this.dataset.del);}">🗑️</span>
-            </div>
-        </div>`;
-    }).join('');
-
-    // ── FIX I1: event delegation במקום inline onclick ──────────────────────
-    el.querySelectorAll('.item-main').forEach(itemEl => {
-        itemEl.addEventListener('click', () => openEdit(itemEl.dataset.id));
-    });
-    el.querySelectorAll('.trash-btn').forEach(btn => {
-        btn.addEventListener('click', (ev) => {
-            ev.stopPropagation();
-            askDeleteConfirm(btn.dataset.del);
-        });
-    });
-}
-
+// ========== Charts ==========
 function updateCharts() {
     const hasAny = entries.length > 0;
-    document.getElementById('chartsEmpty').style.display    = hasAny ? 'none' : 'block';
-    document.getElementById('chartsContent').style.display  = hasAny ? 'block' : 'none';
+    document.getElementById('chartsEmpty').style.display   = hasAny ? 'none'  : 'block';
+    document.getElementById('chartsContent').style.display = hasAny ? 'block' : 'none';
     if (!hasAny) return;
 
-    const ctxBar = document.getElementById('barChart').getContext('2d');
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    const labels = [], ds = { inc: [], exp: [], fix: [] };
+    const ctxBar         = document.getElementById('barChart').getContext('2d');
+    const ctxPie         = document.getElementById('pieChart').getContext('2d');
+    const ctxCategoryPie = document.getElementById('categoryPieChart').getContext('2d');
 
-    for (let i = 5; i >= 0; i--) {
-        const d = new Date(viewDate.getFullYear(), viewDate.getMonth() - i, 1);
-        labels.push(new Intl.DateTimeFormat('he-IL', { month: 'short' }).format(d));
-        const mD = getEntriesForMonth(d.getFullYear(), d.getMonth()); // FIX I11
+    // Bar chart — FIX 4: null after destroy, FIX 5: getEntriesForMonth
+    const labels=[], ds={inc:[],exp:[],fix:[]};
+    for (let i=5; i>=0; i--) {
+        const d = new Date(viewDate.getFullYear(), viewDate.getMonth()-i, 1);
+        labels.push(new Intl.DateTimeFormat('he-IL',{month:'short'}).format(d));
+        const mD = getEntriesForMonth(d.getFullYear(), d.getMonth());
         const mf = getMonthlyFixed(d.getFullYear(), d.getMonth());
-        ds.inc.push(mD.filter(e => e.type === 'income').reduce((a, b)  => a + b.amount, 0));
-        ds.exp.push(mD.filter(e => e.type === 'expense').reduce((a, b) => a + b.amount, 0));
+        ds.inc.push(mD.filter(e=>e.type==='income').reduce((a,b)=>a+b.amount,0));
+        ds.exp.push(mD.filter(e=>e.type==='expense').reduce((a,b)=>a+b.amount,0));
         ds.fix.push(mf);
     }
+    const cI=ds.inc[5], cE=ds.exp[5], cF=ds.fix[5];
 
-    const cI = ds.inc[5], cE = ds.exp[5], cF = ds.fix[5];
-
-    // FIX I10: אפס גם bar ל-null אחרי destroy (עקביות)
-    if (charts.bar) { charts.bar.destroy(); charts.bar = null; ctxBar.clearRect(0, 0, ctxBar.canvas.width, ctxBar.canvas.height); }
+    // FIX 4: destroy + null ref
+    if (charts.bar)  { charts.bar.destroy();  charts.bar  = null; ctxBar.clearRect(0,0,ctxBar.canvas.width,ctxBar.canvas.height); }
     charts.bar = new Chart(ctxBar, {
         type: 'bar',
         data: { labels, datasets: [
-            { label: `הכנסות: ₪${cI.toLocaleString()}`, data: ds.inc, backgroundColor: '#10b981', borderRadius: 6 },
-            { label: `הוצאות: ₪${cE.toLocaleString()}`, data: ds.exp, backgroundColor: '#f43f5e', borderRadius: 6 },
-            { label: `קבועות: ₪${cF.toLocaleString()}`, data: ds.fix, backgroundColor: '#8b5cf6', borderRadius: 6 }
+            { label:'הכנסות', data:ds.inc, backgroundColor:'#10b981', borderRadius:6 },
+            { label:'הוצאות', data:ds.exp, backgroundColor:'#f43f5e', borderRadius:6 },
+            { label:'קבועות', data:ds.fix, backgroundColor:'#8b5cf6', borderRadius:6 }
         ]},
-        options: { responsive: true, maintainAspectRatio: true,
-            plugins: { legend: { display: true, labels: { color: '#f8fafc', font: { size: 10, weight: 'bold' } } } },
-            scales: {
-                x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(255,255,255,0.04)' } }
-            }
+        options: { responsive:true, maintainAspectRatio:true,
+            plugins:{legend:{display:true,labels:{color:'#f8fafc',font:{size:10,weight:'bold'}}}},
+            scales:{x:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#64748b'},grid:{color:'rgba(255,255,255,0.04)'}}}
         }
     });
 
-    if (charts.pie) { charts.pie.destroy(); charts.pie = null; ctxPie.clearRect(0, 0, ctxPie.canvas.width, ctxPie.canvas.height); }
+    // General pie — FIX 4: null after destroy
+    if (charts.pie) { charts.pie.destroy(); charts.pie = null; ctxPie.clearRect(0,0,ctxPie.canvas.width,ctxPie.canvas.height); }
     const pieNoData = document.getElementById('pieNoData');
-    if (cI + cE + cF === 0) {
+    if (cI+cE+cF===0) {
         ctxPie.canvas.style.display = 'none';
         if (pieNoData) pieNoData.style.display = 'block';
-        return;
+    } else {
+        ctxPie.canvas.style.display = 'block';
+        if (pieNoData) pieNoData.style.display = 'none';
+        charts.pie = new Chart(ctxPie, {
+            type:'doughnut',
+            data:{labels:[`₪${cI.toLocaleString()} הכנסות`,`₪${cE.toLocaleString()} הוצאות`,`₪${cF.toLocaleString()} קבועות`],
+                datasets:[{data:[cI,cE,cF],backgroundColor:['#10b981','#f43f5e','#8b5cf6'],borderWidth:0,radius:'80%'}]},
+            options:{cutout:'70%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#f8fafc',font:{size:11},padding:14}}}}
+        });
     }
-    ctxPie.canvas.style.display = 'block';
-    if (pieNoData) pieNoData.style.display = 'none';
-    charts.pie = new Chart(ctxPie, {
-        type: 'doughnut',
-        data: {
-            labels: [`הכנסות ₪${cI.toLocaleString()}`, `הוצאות ₪${cE.toLocaleString()}`, `קבועות ₪${cF.toLocaleString()}`],
-            datasets: [{ data: [cI, cE, cF], backgroundColor: ['#10b981','#f43f5e','#8b5cf6'], borderWidth: 0, radius: '80%' }]
-        },
-        options: { cutout: '70%', plugins: { legend: { display: true, position: 'bottom', labels: { color: '#f8fafc', font: { size: 11 }, padding: 14 } } } }
+
+    // Category pie — FIX 4: null after destroy, FIX 5: getEntriesForMonth
+    if (charts.categoryPie) { charts.categoryPie.destroy(); charts.categoryPie = null; ctxCategoryPie.clearRect(0,0,ctxCategoryPie.canvas.width,ctxCategoryPie.canvas.height); }
+    const monthExpenses = getEntriesForMonth(viewDate.getFullYear(), viewDate.getMonth()).filter(e=>e.type==='expense');
+    const catExpMap = new Map();
+    monthExpenses.forEach(e => {
+        const catId = e.category || 'cat_other';
+        catExpMap.set(catId, (catExpMap.get(catId)||0) + e.amount);
+    });
+    const catExpData = Array.from(catExpMap.entries())
+        .map(([catId,amount]) => ({ catId, amount, name:getCategoryName(catId) }))
+        .sort((a,b)=>b.amount-a.amount);
+    const catPieNoData = document.getElementById('categoryPieNoData');
+    if (catExpData.length===0 || catExpData.reduce((s,cd)=>s+cd.amount,0)===0) {
+        ctxCategoryPie.canvas.style.display = 'none';
+        if (catPieNoData) catPieNoData.style.display = 'block';
+    } else {
+        ctxCategoryPie.canvas.style.display = 'block';
+        if (catPieNoData) catPieNoData.style.display = 'none';
+        const colors=['#10b981','#f43f5e','#8b5cf6','#f59e0b','#06b6d4','#ec4899','#84cc16','#6366f1'];
+        charts.categoryPie = new Chart(ctxCategoryPie, {
+            type:'doughnut',
+            data:{labels:catExpData.map(cd=>`${safe(cd.name)} (₪${cd.amount.toLocaleString()})`),
+                datasets:[{data:catExpData.map(cd=>cd.amount),backgroundColor:catExpData.map((_,i)=>colors[i%colors.length]),borderWidth:0,radius:'80%'}]},
+            options:{cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#f8fafc',font:{size:10},padding:12}}}}
+        });
+    }
+}
+
+// ========== Export/Import ==========
+function exportToCSV() {
+    try {
+        const em=viewDate.getMonth(), ey=viewDate.getFullYear();
+        const mE = getEntriesForMonth(ey, em); // FIX 5
+        let csv="\uFEFFתיאור,סכום,סוג,קטגוריה,תאריך\n";
+        mE.forEach(e=>{ csv+=`"${e.desc.replace(/"/g,'""')}",${e.amount},${e.type==='income'?'הכנסה':'הוצאה'},"${getCategoryName(e.category||'')}",${e.date}\n`; });
+        entries.filter(e=>e.type==='fixed').forEach(e=>{ csv+=`"${e.desc.replace(/"/g,'""')}",${e.amount},הוצאה קבועה,"${getCategoryName(e.category||'')}",${e.date||'כל חודש'}\n`; });
+        const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`money-${em+1}-${ey}.csv`; a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+        showToast('הייצוא הושלם','var(--income)');
+    } catch(e) { handleError(e,'exportToCSV'); }
+}
+function exportToJSON() {
+    try {
+        const blob=new Blob([JSON.stringify({entries,categories},null,2)],{type:'application/json'});
+        const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`backup-${new Date().toISOString().split('T')[0]}.json`; a.click();
+        setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+        showToast('גיבוי נוצר בהצלחה','var(--income)');
+    } catch(e) { handleError(e,'exportToJSON'); }
+}
+function triggerImportJSON() { document.getElementById('importJsonFile').click(); }
+function handleImportJSON(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        if (!db) { showToast('אין חיבור לענן','var(--expense)'); return; }
+        try {
+            const data = JSON.parse(e.target.result);
+            let importedEntries=[], importedCategories=[];
+            if (Array.isArray(data)) { importedEntries=data; }
+            else if (data.entries && Array.isArray(data.entries)) { importedEntries=data.entries; importedCategories=data.categories||[]; }
+            else throw new Error('Invalid format');
+            const valid=['income','expense','fixed'], batch={};
+            importedEntries.forEach((item,idx)=>{
+                if(item.id&&item.desc&&typeof item.amount==='number'&&item.amount>0&&valid.includes(item.type)) batch[item.id]=item;
+                else console.warn('Skipping item at',idx,item);
+            });
+            if(!Object.keys(batch).length) throw new Error('No valid items');
+            db.update(batch).then(()=>{
+                if(importedCategories.length && currentUserId){
+                    const catRef=firebase.database().ref(`users/${currentUserId}/categories`);
+                    const catBatch={};
+                    importedCategories.forEach(c=>{ if(c.id&&c.name) catBatch[c.id]=c; });
+                    if(Object.keys(catBatch).length) catRef.update(catBatch);
+                }
+                showToast(`שוחזרו ${Object.keys(batch).length} פריטים ✓`,'var(--income)');
+                clearAllCache();
+                if(isSettingsOpen) toggleSettings();
+            }).catch(e=>handleError(e,'importJSON.update'));
+        } catch(e) { handleError(e,'importJSON.parse'); }
+    };
+    reader.onerror = e => handleError(e,'importJSON.reader');
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// ========== Firebase Init ==========
+function init() {
+    checkOnboarding();
+    firebase.auth().signInAnonymously().then(user => {
+        currentUserId = user.user.uid;
+        db = firebase.database().ref(`users/${currentUserId}/data`);
+        const categoriesRef = firebase.database().ref(`users/${currentUserId}/categories`);
+
+        document.getElementById('statusDot').className = 'status-dot online';
+        document.getElementById('statusText').innerText = 'מחובר ✓';
+        document.getElementById('settingsCloudText').innerHTML = '☁️ סנכרון ענן פעיל — הנתונים נשמרים אוטומטית';
+        // FIX 1: hide offline banner on success
+        document.getElementById('offlineBanner').classList.remove('show');
+
+        categoriesRef.on('value', snap => {
+            if (snap.val()) {
+                categories = Object.values(snap.val());
+            } else {
+                categories = [...DEFAULT_CATEGORIES];
+                const batch = {};
+                categories.forEach(c => { batch[c.id] = c; });
+                categoriesRef.update(batch);
+            }
+            updateCategorySelect();
+        });
+
+        db.on('value', snap => {
+            try {
+                entries = snap.val() ? Object.values(snap.val()) : [];
+                document.getElementById('loadingBar').classList.add('hidden');
+                render();
+                if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
+                clearAllCache();
+            } catch(err) { handleError(err,'db.onValue'); }
+        }, err => handleError(err,'db.subscription'));
+
+    }).catch(error => {
+        handleError(error,'firebase.auth');
+        document.getElementById('loadingBar').classList.add('hidden');
+        document.getElementById('statusText').innerText = 'לא מקוון';
+        document.getElementById('statusDot').style.background = 'var(--text-dim)';
+        document.getElementById('settingsCloudText').innerHTML = '⚠️ אין חיבור לענן — הנתונים לא יישמרו.';
+        // FIX 1: show offline banner on failure
+        document.getElementById('offlineBanner').classList.add('show');
+        render();
     });
 }
 
-// ── FIX I8: CSV export עקבי ───────────────────────────────────────────────
-function exportToCSV() {
-    try {
-        const em = viewDate.getMonth(), ey = viewDate.getFullYear();
-        const mE = getEntriesForMonth(ey, em); // FIX I11
-        let csv = "\uFEFFתיאור,סכום,סוג,תאריך\n";
-        mE.forEach(e => {
-            csv += `"${e.desc.replace(/"/g, '""')}",${e.amount},${e.type === 'income' ? 'הכנסה' : 'הוצאה'},${e.date}\n`;
-        });
-        // FIX I8: תיאור עקבי לקבועות
-        entries.filter(e => e.type === 'fixed').forEach(e => {
-            const fixedDateLabel = e.date ? `קבוע מ-${e.date}` : 'קבוע חודשי';
-            csv += `"${e.desc.replace(/"/g, '""')}",${e.amount},הוצאה קבועה,${fixedDateLabel}\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `money-${em + 1}-${ey}.csv`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        showToast('הייצוא הושלם', 'var(--income)');
-    } catch(e) { handleError(e, 'exportToCSV'); }
-}
-
-function exportToJSON() {
-    try {
-        const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        showToast('גיבוי נוצר בהצלחה', 'var(--income)');
-    } catch(e) { handleError(e, 'exportToJSON'); }
-}
-
-function triggerImportJSON() {
-    showConfirm('שחזור גיבוי', 'שחזור יוסיף את הנתונים מהקובץ לענן. פעולה זו בלתי הפיכה. להמשיך?', 'var(--fixed)');
-    pendingAction = 'import';
-}
-function doImport() { document.getElementById('importJsonFile').click(); }
-
-document.getElementById('importJsonFile').addEventListener('change', function(ev) {
-    const file = ev.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        if (!db) { showToast('אין חיבור לענן', 'var(--expense)'); return; }
-        try {
-            const data = JSON.parse(e.target.result);
-            if (!Array.isArray(data)) throw new Error('Invalid format');
-            const valid = ['income','expense','fixed'], batch = {};
-            data.forEach((item, idx) => {
-                if (item.id && item.desc && typeof item.amount === 'number' && item.amount > 0 && valid.includes(item.type)) {
-                    batch[item.id] = item;
-                } else { console.warn('Skipping item at', idx, item); }
-            });
-            if (!Object.keys(batch).length) throw new Error('No valid items');
-            db.update(batch)
-              .then(() => {
-                  showToast(`שוחזרו ${Object.keys(batch).length} פריטים ✓`, 'var(--income)');
-                  cache.monthlyFixed.clear();
-                  if (isSettingsOpen) toggleSettings();
-              })
-              .catch(e => handleError(e, 'importJSON.update'));
-        } catch(e) { handleError(e, 'importJSON.parse'); }
-    };
-    reader.onerror = e => handleError(e, 'importJSON.reader');
-    reader.readAsText(file);
-    ev.target.value = '';
-});
-
-function showToast(msg, color) {
-    const t = document.getElementById('privacyToast');
-    let icon = 'ℹ️';
-    if (msg.includes('נשמר'))   icon = '✅';
-    if (msg.includes('נמחק'))   icon = '🗑️';
-    if (msg.includes('פרטיות')) icon = '🔒';
-    if (msg.includes('רגילה'))  icon = '👁️';
-    if (msg.includes('גיבוי') || msg.includes('ייצוא')) icon = '💾';
-    if (msg.includes('שוחזרו')) icon = '🔄';
-    document.getElementById('toastIcon').innerText = icon;
-    document.getElementById('toastText').innerText = msg;
-    const bg = { 'var(--income)':'rgba(16,185,129,0.2)', 'var(--expense)':'rgba(244,63,94,0.2)', 'var(--accent)':'rgba(14,165,233,0.2)' };
-    const bd = { 'var(--income)':'#10b981', 'var(--expense)':'#f43f5e', 'var(--accent)':'#0ea5e9' };
-    t.style.background = color ? (bg[color] || 'rgba(15,23,42,0.9)') : 'rgba(15,23,42,0.9)';
-    t.style.border = color ? `1px solid ${bd[color] || color}` : '1px solid rgba(255,255,255,0.1)';
-    t.classList.add('show');
-    clearTimeout(t._t);
-    t._t = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
+// ========== Event Listeners ==========
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeConfirm(); closeAllSheets(); } });
+document.getElementById('importJsonFile').addEventListener('change', handleImportJSON);
 
-// Swipe לשינוי חודש
+// FIX 2: strict swipe — dx>65, dy<30, dx>dy*2 (prevents accidental month change during scroll)
 (function() {
     let touchStartX = 0, touchStartY = 0;
     document.addEventListener('touchstart', e => {
@@ -1211,9 +1506,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeConfi
         touchStartY = e.changedTouches[0].clientY;
     }, { passive: true });
     document.addEventListener('touchend', e => {
-        if (isFabOpen || isSettingsOpen) return;
+        if (isFabOpen || isSettingsOpen || isCategoryOpen || isCategoryEditOpen) return;
         const dx = e.changedTouches[0].clientX - touchStartX;
         const dy = e.changedTouches[0].clientY - touchStartY;
+        // FIX 2: stricter thresholds from V3
         if (Math.abs(dx) > 65 && Math.abs(dy) < 30 && Math.abs(dx) > Math.abs(dy) * 2) {
             changeMonth(dx > 0 ? -1 : 1);
         }
