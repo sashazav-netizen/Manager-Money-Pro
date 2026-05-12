@@ -185,7 +185,7 @@
             background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 8px;
             font-size: 0.6rem; color: var(--text-dim); margin-top: 4px; display: inline-block;
         }
-        /* trash-btn נגישות */
+        /* FIX F1 — trash-btn נגישות */
         .trash-btn {
             color: var(--expense); font-size: 1rem; cursor: pointer; opacity: 0.45;
             margin-right: 12px; transition: opacity 0.2s, transform 0.2s; padding: 4px;
@@ -856,8 +856,7 @@ function openCategoryDialog(catId = null) {
     const title     = document.getElementById('categoryDialogTitle');
     const nameInput = document.getElementById('catName');
     if (catId) {
-        const cat = categories.find(c => c.id === catId);
-        if (!cat) { isCategoryEditOpen = false; return; } // guard: reset flag if cat not found
+        const cat = categories.find(c => c.id === catId); if (!cat) return;
         title.innerText     = 'ערוך קטגוריה';
         nameInput.value     = cat.name;
         pendingCategoryType = cat.type;
@@ -871,8 +870,6 @@ function openCategoryDialog(catId = null) {
     document.getElementById('categoryEditSheet').classList.add('open');
     document.getElementById('overlay').style.display = 'block';
     lockBodyScroll();
-    // פוקוס על שדה השם אחרי פתיחה
-    setTimeout(() => nameInput.focus(), 350);
 }
 function setCategoryType(type) {
     pendingCategoryType = type;
@@ -892,26 +889,24 @@ function closeCategoryEdit() {
     pendingCategoryType = 'expense';
 }
 
+// FIX F4: saveCategory — הסר once() כפול, catListener יעדכן אוטומטית
 function saveCategory() {
     const catName = document.getElementById('catName').value.trim();
     const catType = document.getElementById('catType').value;
     if (!catName) { showToast('נא להזין שם קטגוריה', 'var(--expense)'); return; }
     if (!catRef)  { showToast('אין חיבור לענן', 'var(--expense)'); return; }
 
-    // M1: מנע לחיצה כפולה
-    const saveBtn = document.querySelector('#categoryEditSheet .btn-main');
-    if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; }
-    const restoreBtn = () => { if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = '1'; } };
-
     if (pendingCategoryId) {
+        // עריכה — catListener מעדכן categories אוטומטית
         catRef.child(pendingCategoryId).update({ name: catName, type: catType })
             .then(() => { showToast('קטגוריה עודכנה', 'var(--income)'); closeCategoryEdit(); })
-            .catch(e => { handleError(e, 'editCategory'); restoreBtn(); });
+            .catch(e => handleError(e, 'editCategory'));
     } else {
+        // הוספה — catListener מעדכן categories אוטומטית
         const newId = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
         catRef.child(newId).set({ id: newId, name: catName, type: catType })
             .then(() => { showToast('קטגוריה נוספה', 'var(--income)'); closeCategoryEdit(); })
-            .catch(e => { handleError(e, 'addCategory'); restoreBtn(); });
+            .catch(e => handleError(e, 'addCategory'));
     }
 }
 
@@ -939,17 +934,12 @@ function closeDeleteCategoryConfirm() {
     }
 }
 
-// Atomic batch — נשאר מ-V5 (נכון) — FIX: closeConfirm בתוך .then()
+// Atomic batch — נשאר מ-V5 (נכון)
 function executeDeleteCategory() {
     const catId = pendingDeleteCategoryId;
     if (!catId || !currentUserId) { closeDeleteCategoryConfirm(); return; }
     const cat = categories.find(c => c.id === catId);
     if (!cat) { closeDeleteCategoryConfirm(); return; }
-
-    // Disable button to prevent double-click
-    const btn = document.getElementById('confirmDeleteCatBtn');
-    if (btn) { btn.disabled = true; btn.style.opacity = '0.5'; }
-
     const updates = {};
     entries.filter(e => e.category === catId).forEach(e => {
         updates[`users/${currentUserId}/data/${e.id}/category`] = 'cat_other';
@@ -958,14 +948,11 @@ function executeDeleteCategory() {
     firebase.database().ref().update(updates)
         .then(() => {
             showToast('קטגוריה נמחקה', null);
-            closeDeleteCategoryConfirm(); // ← FIX: בתוך .then() בלבד
-            clearAllCache();
-        })
-        .catch(e => {
-            handleError(e, 'deleteCategory');
             closeDeleteCategoryConfirm();
+            clearAllCache();
+            // catListener מעדכן אוטומטית — אין צורך ב-once()
         })
-        .finally(() => { if (btn) { btn.disabled = false; btn.style.opacity = '1'; } });
+        .catch(e => handleError(e, 'deleteCategory'));
 }
 function deleteCategory(catId) {
     const cat = categories.find(c => c.id === catId); if (!cat) return;
@@ -986,7 +973,8 @@ function closeCategoryManager() {
     document.getElementById('overlay').style.display = (isFabOpen || isSettingsOpen || isCategoryEditOpen) ? 'block' : 'none';
     if (!isFabOpen && !isSettingsOpen && !isCategoryEditOpen) unlockBodyScroll();
     updateCategorySelect();
-    // M2: לא קורא ל-render() — db listener מעדכן אוטומטית בכל שינוי נתונים
+    render();
+    if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
 }
 
 // ═══════════════════════════════════════════════
@@ -1122,7 +1110,9 @@ function validateAndAsk() {
     askSaveConfirm();
 }
 
+// FIX F5: החזרת טיפול ב-import + FIX race condition (closeConfirm בתוך .then)
 function executeConfirmed() {
+    // FIX F5: טיפול ב-import שנעלם מ-V5
     if (pendingAction === 'import') {
         closeConfirm();
         doImportFile();
@@ -1141,7 +1131,7 @@ function executeConfirmed() {
             .then(() => {
                 showToast('נשמר', 'var(--income)');
                 clearAllCache();
-                closeConfirm();
+                closeConfirm();      // ← בתוך .then בלבד
                 if (isFabOpen) toggleFab();
             })
             .catch(e => { handleError(e, 'save'); closeConfirm(); })
@@ -1154,7 +1144,7 @@ function executeConfirmed() {
             .then(() => {
                 showToast('נמחק', null);
                 clearAllCache();
-                closeConfirm();
+                closeConfirm();      // ← בתוך .then בלבד
             })
             .catch(e => { handleError(e, 'delete'); closeConfirm(); })
             .finally(() => { btn.disabled = false; btn.style.opacity = '1'; });
@@ -1207,6 +1197,7 @@ function showPage(p, el) {
     if (p === 'charts') updateCharts();
 }
 
+// FIX F3: השוואת שנה/חודש — ללא timezone issues
 function changeMonth(n) {
     const next = new Date(viewDate.getFullYear(), viewDate.getMonth() + n, 1);
     const nowY = new Date().getFullYear();
@@ -1222,6 +1213,7 @@ function changeMonth(n) {
 // Render
 // ═══════════════════════════════════════════════
 
+// FIX F1: renderList — data-id + event delegation, ללא e.id גולמי ב-onclick
 function renderList(id, data, emptyId) {
     const el    = document.getElementById(id); if (!el) return;
     const empty = emptyId ? document.getElementById(emptyId) : null;
@@ -1252,6 +1244,7 @@ function renderList(id, data, emptyId) {
         </div>`;
     }).join('');
 
+    // FIX F1: event delegation בטוח
     el.querySelectorAll('.item-main').forEach(item => {
         item.addEventListener('click', () => openEdit(item.dataset.id));
     });
@@ -1475,6 +1468,7 @@ function exportToJSON() {
     } catch(e) { handleError(e,'exportToJSON'); }
 }
 
+// FIX F8: triggerImportJSON — החזרת confirm dialog לפני שחזור
 function triggerImportJSON() {
     pendingAction = 'import';
     showConfirm('שחזור גיבוי', 'שחזור יוסיף את הנתונים מהקובץ לענן. פעולה זו בלתי הפיכה. להמשיך?', 'var(--fixed)');
@@ -1494,34 +1488,25 @@ function handleImportJSON(event) {
                 importedEntries    = data.entries;
                 importedCategories = data.categories || [];
             } else throw new Error('Invalid format');
-
-            const validEntryTypes = ['income','expense','fixed'];
-            const validCatTypes   = ['income','expense'];
-            const batch = {};
-            importedEntries.forEach((item, idx) => {
-                if (item.id && item.desc && typeof item.amount === 'number' &&
-                    item.amount > 0 && validEntryTypes.includes(item.type)) {
-                    batch[item.id] = item;
-                } else { console.warn('Skipping entry at', idx, item); }
+            const valid=['income','expense','fixed'], batch={};
+            importedEntries.forEach((item,idx) => {
+                if (item.id&&item.desc&&typeof item.amount==='number'&&item.amount>0&&valid.includes(item.type)) batch[item.id]=item;
+                else console.warn('Skipping item at',idx,item);
             });
             if (!Object.keys(batch).length) throw new Error('No valid items');
-
             db.update(batch).then(() => {
                 if (importedCategories.length && catRef) {
                     const catBatch = {};
-                    importedCategories.forEach(c => {
-                        if (c.id && c.name && validCatTypes.includes(c.type)) catBatch[c.id] = c;
-                        else console.warn('Skipping category:', c);
-                    });
+                    importedCategories.forEach(c => { if(c.id&&c.name) catBatch[c.id]=c; });
                     if (Object.keys(catBatch).length) catRef.update(catBatch);
                 }
-                showToast(`שוחזרו ${Object.keys(batch).length} פריטים ✓`, 'var(--income)');
+                showToast(`שוחזרו ${Object.keys(batch).length} פריטים ✓`,'var(--income)');
                 clearAllCache();
                 if (isSettingsOpen) toggleSettings();
-            }).catch(e => handleError(e, 'importJSON.update'));
-        } catch(e) { handleError(e, 'importJSON.parse'); }
+            }).catch(e => handleError(e,'importJSON.update'));
+        } catch(e) { handleError(e,'importJSON.parse'); }
     };
-    reader.onerror = e => handleError(e, 'importJSON.reader');
+    reader.onerror = e => handleError(e,'importJSON.reader');
     reader.readAsText(file);
     event.target.value = '';
 }
@@ -1534,13 +1519,14 @@ function init() {
     firebase.auth().signInAnonymously().then(user => {
         currentUserId = user.user.uid;
         db     = firebase.database().ref(`users/${currentUserId}/data`);
-        catRef = firebase.database().ref(`users/${currentUserId}/categories`);
+        catRef = firebase.database().ref(`users/${currentUserId}/categories`); // FIX F6: גלובלי
 
         document.getElementById('statusDot').className = 'status-dot online';
         document.getElementById('statusText').innerText = 'מחובר ✓';
         document.getElementById('settingsCloudText').innerHTML = '☁️ סנכרון ענן פעיל — הנתונים נשמרים אוטומטית';
         document.getElementById('offlineBanner').classList.remove('show');
 
+        // FIX F6: נתק listeners קודמים לפני רישום חדש
         if (catListener) catRef.off('value', catListener);
         catListener = catRef.on('value', snap => {
             if (snap.val()) {
@@ -1552,9 +1538,13 @@ function init() {
                 catRef.update(batch);
             }
             updateCategorySelect();
+            // מעדכן רשימת קטגוריות אם המנהל פתוח
             if (isCategoryOpen) renderCategoriesList();
+            render();
+            if (document.getElementById('page-charts').classList.contains('active')) updateCharts();
         }, err => handleError(err, 'catRef.subscription'));
 
+        // FIX F6: נתק db listener קודם לפני רישום חדש
         if (dbListener) db.off('value', dbListener);
         dbListener = db.on('value', snap => {
             try {
@@ -1583,6 +1573,7 @@ function init() {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeConfirm(); closeAllSheets(); } });
 document.getElementById('importJsonFile').addEventListener('change', handleImportJSON);
 
+// FIX F3: swipe — threshold 65px + ratio 2 (ללא timezone issues)
 (function() {
     let touchStartX = 0, touchStartY = 0;
     document.addEventListener('touchstart', e => {
